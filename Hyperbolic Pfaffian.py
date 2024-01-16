@@ -14,6 +14,12 @@ def cmax(n,g):
         c0+=n0+n1
     return c0
 
+def sigma(g):
+    if g==0:
+        return 0
+    else:
+        return 1
+
 def Hyp(n, g):
     E,Eo = [],[]  #Edges and edges with orientations
     vertices_list=[[]]
@@ -37,7 +43,7 @@ def Hyp(n, g):
         for v in vertices_list[-1]:
             c0=v[-1]
             if v[-2] != 0:
-                if v[-2]!=n-4:
+                if v[-2]!=(n-4)*sigma(g-1):
                     for i in range(0, n-3):
                         c += 1
                         if i==0:
@@ -54,7 +60,7 @@ def Hyp(n, g):
                             nv.append(i)
                             nv.append(c)
                             new_vertices.append(nv)
-                            E.append((c,vertices_list[-1][0][-1]+1))
+                            E.append((c,cmax(n,g-1)+1))
                 else:
                     for i in range(0, n-4):
                         c += 1
@@ -65,15 +71,13 @@ def Hyp(n, g):
                             nv.append(i)
                             nv.append(c)
                             new_vertices.append(nv)
-                            E.append((c,vertices_list[-1][0][-1]+1))
+                            E.append((c,cmax(n,g-1)+1))
                         else:
                             nv = v[:-1]  # Remove the last element of v
                             nv.append(i)
                             nv.append(c)
                             new_vertices.append(nv)
                             E.append((c,c+1))
-
-        E.append((cmax(n,g),cmax(n,g-1)+1))
         vertices_list.append(new_vertices)
         j += 1
     return vertices_list, E
