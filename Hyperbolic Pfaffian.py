@@ -43,7 +43,7 @@ def Hyp(n, g):
         for v in vertices_list[-1]:
             c0=v[-1]
             if v[-2] != 0:
-                if v[-2]!=(n-4)*sigma(g-1):
+                if v[-2]!=(n-4)*sigma(j-1):
                     for i in range(0, n-3):
                         c += 1
                         if i==0:
@@ -86,7 +86,7 @@ def Hyp(n, g):
 # Print the vertices of the second layer (j=1)
 
 
-E=Hyp(7,2)[1]
+E=Hyp(7,1)[1]
 G=nx.Graph(E)
 G.add_edges_from(E)
 nx.draw(G, with_labels=True)
