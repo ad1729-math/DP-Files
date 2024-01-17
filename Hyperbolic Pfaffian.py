@@ -5,17 +5,17 @@ import matplotlib.pyplot as plt
 
 
 def cmax(n,g):
-    n0,n1=0,n
-    c0=n
     if g==0:
         return n
     else:
+        n0,n1=0,n
+        c0=n
         for i in range(1,g+1):
             a,b=n0,n1
             n0=b
             n1=(n-4)*b-a
             c0+=n0+n1
-            return c0
+    return c0
 
 
 def sigma(g):
@@ -51,7 +51,7 @@ def Hyp(n, g):
             c += 1
             vertices_list[0].append([i,c])
             E.append((c,1))
-            Eo.append([(c,c+1),1])
+            Eo.append([(c,1),1])
 
     j = 1
     while j <= g:
@@ -73,9 +73,9 @@ def Hyp(n, g):
                             E.append((c,c+1)) #Need to put conditions 
                             sgn=Eo[E.index((c0,f(n,c0,j-1)))][1]
                             if i<int((n-3)/2)+(1+sgn)/2:
-                                Eo.append([(c,c+1),1])
+                               Eo.append([(c,c+1),1])
                             else:
-                                Eo.append([(c,c+1),-1])
+                               Eo.append([(c,c+1),-1])
                             
                         else:
                             nv = v[:-1]  # Remove the last element of v
@@ -90,6 +90,7 @@ def Hyp(n, g):
                         c += 1
                         if i==0:
                            E.append((c0,c))
+                           Eo.append([(c0,c),1])
                         if c==cmax(n,g):
                             nv = v[:-1]  # Remove the last element of v
                             nv.append(i)
@@ -99,25 +100,25 @@ def Hyp(n, g):
                             Eo.append([(c,cmax(n,g-1)+1),-1])
                             break
                         else:
-                            nv = v[:-1]  # Remove the last element of v
+                            v = v[:-1]  # Remove the last element of v
                             nv.append(i)
                             nv.append(c)
                             new_vertices.append(nv)
                             E.append((c,c+1))
-                            sgn=Eo[E.index((c0,f(c0, n, j-1)))][1]
                             if i<int((n-3)/2)+(1+sgn)/2:
                                 Eo.append([(c,c+1),1])
                             else:
-                                Eo.append([(c,c+1),-1])
+                               Eo.append([(c,c+1),-1])
         vertices_list.append(new_vertices)
         j += 1
-    return vertices_list, E ,Eo
+    return vertices_list, E , Eo
 
 # Example usage
 # Print the vertices of the second layer (j=1)
 
 
-E,Eo=Hyp(7,1)[1],Hyp(7,1)[2]
+E,Eo=Hyp(7,2)[1],Hyp(7,2)[2]
+#E=Hyp(7,2)[1]
 G=nx.Graph(E)
 G.add_edges_from(E)
 nx.draw(G, with_labels=True)
