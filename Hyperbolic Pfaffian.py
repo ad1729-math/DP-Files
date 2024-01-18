@@ -134,9 +134,7 @@ def A(b, I ,g ,n):
     v=cmax(n,g)
     Eo=Hyp(n,g)[2]
     A=[]
-    Edges=[]
-    for k in range(len(Eo)):
-        Edges.append(Eo[k][0])
+    Edges=Hyp(n,g)[1]
         
     for i in range(1,v+1):
         B=[]
