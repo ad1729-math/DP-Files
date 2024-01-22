@@ -6,7 +6,9 @@ from numpy.linalg import eig
 
 #Total number points upto generation g
 def cmax(n,g):
-    if g==0:
+    if g==-1:
+        return 0
+    elif g==0:
         return n
     else:
         n0,n1=0,n
@@ -86,32 +88,30 @@ def Hyp(n, g):
                             new_vertices.append(nv)
                             E.append((c,cmax(n,j-1)+1))
                             Eo.append([(c,cmax(n,j-1)+1),-1])
-                      
                 else:
-                    if v[-2]==(n-4)*sigma(j-1):
-                        for i in range(0, n-4):  #These are the points just to the left of an n0 point
-                            c += 1
-                            if i==0:
-                             E.append((c0,c))
-                             Eo.append([(c0,c),1])
-                            if c<cmax(n,j):
-                                nv = v[:-1]  # Remove the last element of v
-                                nv.append(i)
-                                nv.append(c)
-                                new_vertices.append(nv)
-                                E.append((c,c+1))
-                                sgn=Eo[E.index((c0,f(n,c0,j-1)))][1]
-                                if i<int((n-3)/2)+(1+sgn)/2:
-                                 Eo.append([(c,c+1),1])
-                                else:
-                                 Eo.append([(c,c+1),-1])
+                    for i in range(0, n-4):  #These are the points just to the left of an n0 point
+                        c += 1
+                        if i==0:
+                            E.append((c0,c))
+                            Eo.append([(c0,c),1])
+                        if c<cmax(n,j):
+                            nv = v[:-1]  # Remove the last element of v
+                            nv.append(i)
+                            nv.append(c)
+                            new_vertices.append(nv)
+                            E.append((c,c+1))
+                            sgn=Eo[E.index((c0,f(n,c0,j-1)))][1]
+                            if i<int((n-3)/2)+(1+sgn)/2:
+                                Eo.append([(c,c+1),1])
                             else:
-                                nv=v[:-1]  # Remove the last element of v
-                                nv.append(i)
-                                nv.append(c)
-                                new_vertices.append(nv)
-                                E.append((c,cmax(n,j-1)+1))
-                                Eo.append([(c,cmax(n,j-1)+1),-1])
+                                Eo.append([(c,c+1),-1])
+                        else:
+                            nv=v[:-1]  # Remove the last element of v
+                            nv.append(i)
+                            nv.append(c)
+                            new_vertices.append(nv)
+                            E.append((c,cmax(n,j-1)+1))
+                            Eo.append([(c,cmax(n,j-1)+1),-1])
                             
         vertices_list.append(new_vertices)
 
@@ -124,42 +124,262 @@ def Hyp(n, g):
 # G=nx.Graph(E)
 # G.add_edges_from(E)
 # nx.draw(G, with_labels=True)
-# print(Eo)
-# # print(Hyp(7,a)[0])
+# print(E)
+# #print(Hyp(7,a)[0])
 # plt.show()
 
 #Building the Pfaffian matrix and calculate the eigenspectrum (May be Sturm sequnce method)
 
-def A(b, I ,g ,n):
+def A(b, I ,n , g):
+    K=1/np.tanh(b*I)
     v=cmax(n,g)
-    Eo=Hyp(n,g)[2]
+    L=Hyp(n,g)
+    Ver,Edges,Eo=L[0],L[1],L[2]
     A=[]
-    Edges=Hyp(n,g)[1]
+
+    Vertices=[]
+    for j in range(0,g+1):
+        for vals in Ver[j]:
+            Vertices.append(vals)
+    
+    def fl(i,j):
+        if j==0:
+           if i==1:
+               return n
+           else: return i-1
+        else: 
+            if i==cmax(n,j-1)+1:
+                return cmax(n,j)
+            else:
+                return i-1
+    
+    def fr(i,j):
+        if j==0:
+           if i<n:
+               return i+1
+           else: 
+               return 1
+        else: 
+            if i==cmax(n,j):
+                return cmax(n,j-1)+1
+            else:
+                return i+1
+
+# #Modifying the graph with Fisher construction
+
+    for gen in range(0, g):
+        for i in range(cmax(n, gen-1)+1, cmax(n, gen)+1):
+            B1, B2, B3 = [], [], []
         
-    for i in range(1,v+1):
-        B=[]
-        for j in range(1,v+1):
-            if (i,j) in Edges:
-                B.append(1/np.tanh(b*I)*Eo[Edges.index((i,j))][1])
-            else: 
-                if (j,i) in Edges:
-                    B.append(-1/np.tanh(b*I)*Eo[Edges.index((j,i))][1])
+            for j in range(1, v + 1):
+                if j <= cmax(n, g - 1):  # i,j both not last layers
+                    if Vertices[i - 1][-2]!= 0:
+                        if j==fl(i, gen):
+                            w=K*Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, -w]
+                            B2 += [0, 0, 0]
+                            B3 += [0, 0, 0]
+                          
+                        elif j==fr(i, gen):
+                            w=K*Eo[Edges.index((i, j))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, 0, 0]
+                            B3 += [w, 0, 0]
+                           
+                        else:
+                            if (i, j) in Edges:
+                                w=K*Eo[Edges.index((i, j))][1]
+                                B1 += [0, 0, 0]
+                                B2 += [0, w, 0]
+                                B3 += [0, 0, 0]
+                                
+                            elif (j, i) in Edges:
+                                w = K * Eo[Edges.index((j, i))][1]
+                                B1 += [0, 0, 0]
+                                B2 += [0, -w, 0]
+                                B3 += [0, 0, 0]
+                               
+                            else:
+                                if j == i:
+                                    B1 += [0, 1, -1]
+                                    B2 += [-1, 0, 1]
+                                    B3 += [1, -1, 0]
+                                    
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, 0, 0]
+                                    B3 += [0, 0, 0]
+                                    
+                    else:
+                        if j == fl(i, gen):
+                            w = K * Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, -w]
+                            B2 += [0, 0, 0]
+                            B3 += [0, 0, 0]
+                           
+                        elif j == fr(i, gen):
+                            w = K * Eo[Edges.index((i, j))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, 0, 0]
+                            B3 += [w, 0, 0]
+                            
+                        else:
+                            if (i, j) in Edges:
+                                w = K * Eo[Edges.index((i,j))][1]
+                                B1 += [0, 0, 0]
+                                B2 += [0, -w, 0]
+                                B3 += [0, 0, 0]
+                                
+                            elif (j, i) in Edges:
+                                w = K * Eo[Edges.index((j, i))][1]
+                                B1 += [0, 0, 0]
+                                B2 += [0, w, 0]
+                                B3 += [0, 0, 0]
+                               
+                            else:
+                                if j == i:
+                                    B1 += [0, -1, 1]
+                                    B2 += [1, 0, -1]
+                                    B3 += [-1, 1, 0]
+                                    
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, 0, 0]
+                                    B3 += [0, 0, 0]
+                else:  # j is in the last layer
+                    if Vertices[j - 1][-2]!= 0:
+                        B1 += [0, 0]
+                        B2 += [0, 0]
+                        B3 += [0, 0]
+                    else:
+                        if (i, j) in Edges:
+                            w=K*Eo[Edges.index((i,j))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, w, 0]
+                            B3 += [0, 0, 0]
+                           
+                        elif (j, i) in Edges:
+                            w = K * Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, -w, 0]
+                            B3 += [0, 0, 0]
+                        else:
+                            B1 += [0, 0, 0]
+                            B2 += [0, 0, 0]
+                            B3 += [0, 0, 0]
+                  
+            A += [B1, B2, B3]
+
+    for i in range(cmax(n,g-1)+1,cmax(n,g)+1):
+        if Vertices[i - 1][-2] == 0:
+            B1, B2, B3 = [], [], []
+            for j in range(1, v + 1):
+                if j == fl(i, g):
+                    w = K*Eo[Edges.index((j, i))][1]
+                    B1 += [0, -w]
+                    B2 += [0, 0]
+                    B3 += [0, 0]
+                elif j == fr(i, g):
+                    w = K * Eo[Edges.index((i, j))][1]
+                    B1 += [0, 0]
+                    B2 += [0, 0]
+                    B3 += [w, 0]
                 else:
-                    B.append(0)
-        A.append(B)
-    return A 
+                    if (i, j) in Edges:
+                        w = K * Eo[Edges.index((i, j))][1]
+                        B1 += [0, 0, 0]
+                        B2 += [0, -w, 0]
+                        B3 += [0, 0, 0]
+                    elif (j, i) in Edges:
+                        w = K * Eo[Edges.index((j, i))][1]
+                        B1 += [0, 0, 0]
+                        B2 += [0, w, 0]
+                        B3 += [0, 0, 0]
+                    else:
+                        if j == i:
+                            B1 += [0, -1, 1]
+                            B2 += [1, 0, -1]
+                            B3 += [-1, 1, 0]
+                        else:
+                            if j>cmax(n,g-1):
+                                if Vertices[j-1][-2]==0:
+                                   B1 += [0, 0, 0]
+                                   B2 += [0, 0, 0]
+                                   B3 += [0, 0, 0]
+                                else:
+                                    B1 += [0, 0]
+                                    B2 += [0, 0]
+                                    B3 += [0, 0]
+                            else:
+                                B1 += [0, 0, 0]
+                                B2 += [0, 0, 0]
+                                B3 += [0, 0, 0]
 
+            A += [B1, B2, B3]
 
-B=np.linspace(1,100,20)
+        else:
+            B1, B2 = [], []
+            for j in range(1, v + 1):
+                if Vertices[j-2][-2]==0:
+                    if j==fl(i, g):
+                        w=K*Eo[Edges.index((j, i))][1]
+                        B1 += [0, 0, -w]
+                        B2 += [0, 0,  0]
+                    elif j==fr(i, g):
+                        w=K*Eo[Edges.index((i, j))][1]
+                        B1 += [0, 0, 0]
+                        B2 += [w, 0, 0]
+                    else:
+                        B1+=[0,0,0]
+                        B2+=[0,0,0]
+                else:
+                    if j==fl(i, g):
+                        w=K*Eo[Edges.index((j, i))][1]
+                        B1 += [0, -w]
+                        B2 += [0, 0]
+                    elif j==fr(i,g):
+                        w=K*Eo[Edges.index((i, j))][1]
+                        B1 += [0,  0]
+                        B2 += [w, 0]
+                    else:
+                        if j==i:
+                            B1+=[0,1]
+                            B2+=[-1,0]
+                        else:
+                            if j>cmax(n,g-1):
+                                B1 += [0,0]
+                                B2 += [0,0]
+                            else:
+                                B1 += [0,0,0]
+                                B2 += [0,0,0]
+            A += [B1, B2]
+
+    return A
+
+#print(len(A(1,2,7,2)), len(A(1,2,7,2)[275]))
+# L=A(1,2,7,1)
+# for i in range(len(L)):
+#     print(len(L[i]))
+
+# print(len(L))
+#  #Almost correct even though n extra points arrives univitedly
+
+#Still little correction is needed to be done. The i part is absolutely correct
+#There should be exactly 280 points in the modified graph.
+#j part creates problem.
+
+B=np.linspace(10,20,50)
 E=[]
 for b in B:
-    Pfaff=np.array(A(b,1,2,7))
+    Pfaff=np.array(A(b,5,7,2))
     e0=eig(Pfaff)[0]
     e0c=np.imag(e0)
     e1=[x for x in e0c if x>=0]
-    E.append(np.sort(e1)[0])
+    E.append(np.sort(e1))
+
+# print(E)
 
 plt.plot(B,E,'ro')
 plt.plot(B,B*0,b)
-plt.ylim([-7,7])
+plt.ylim([-10,10])
 plt.show()
