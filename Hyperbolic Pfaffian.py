@@ -2,7 +2,7 @@ import math as m
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from numpy.linalg import eig
+from numpy.linalg import eig, det
 
 #Total number points upto generation g
 def cmax(n,g):
@@ -117,7 +117,7 @@ def Hyp(n, g):
 
     return vertices_list, E , Eo
 
-#Almost there
+#Picture of the hyperbolic lattice
 
 # a=int(input("Enter number of generations"))
 # E,Eo=Hyp(7,a)[1],Hyp(7,a)[2]
@@ -192,13 +192,7 @@ def A(b, I ,n , g):
                                 B1 += [0, 0, 0]
                                 B2 += [0, w, 0]
                                 B3 += [0, 0, 0]
-                                
-                            elif (j, i) in Edges:
-                                w = K * Eo[Edges.index((j, i))][1]
-                                B1 += [0, 0, 0]
-                                B2 += [0, -w, 0]
-                                B3 += [0, 0, 0]
-                               
+
                             else:
                                 if j == i:
                                     B1 += [0, 1, -1]
@@ -223,17 +217,11 @@ def A(b, I ,n , g):
                             B2 += [0, 0, 0]
                             B3 += [w, 0, 0]
                             
-                        else:
-                            if (i, j) in Edges:
-                                w = K * Eo[Edges.index((i,j))][1]
+                        else:   
+                            if (j, i) in Edges:
+                                w = K * Eo[Edges.index((j,i))][1]
                                 B1 += [0, 0, 0]
                                 B2 += [0, -w, 0]
-                                B3 += [0, 0, 0]
-                                
-                            elif (j, i) in Edges:
-                                w = K * Eo[Edges.index((j, i))][1]
-                                B1 += [0, 0, 0]
-                                B2 += [0, w, 0]
                                 B3 += [0, 0, 0]
                                
                             else:
@@ -257,12 +245,6 @@ def A(b, I ,n , g):
                             B1 += [0, 0, 0]
                             B2 += [0, w, 0]
                             B3 += [0, 0, 0]
-                           
-                        elif (j, i) in Edges:
-                            w = K * Eo[Edges.index((j, i))][1]
-                            B1 += [0, 0, 0]
-                            B2 += [0, -w, 0]
-                            B3 += [0, 0, 0]
                         else:
                             B1 += [0, 0, 0]
                             B2 += [0, 0, 0]
@@ -285,15 +267,10 @@ def A(b, I ,n , g):
                     B2 += [0, 0]
                     B3 += [w, 0]
                 else:
-                    if (i, j) in Edges:
-                        w = K * Eo[Edges.index((i, j))][1]
-                        B1 += [0, 0, 0]
-                        B2 += [0, -w, 0]
-                        B3 += [0, 0, 0]
-                    elif (j, i) in Edges:
+                    if (j, i) in Edges:
                         w = K * Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, 0]
-                        B2 += [0, w, 0]
+                        B2 += [0, -w, 0]
                         B3 += [0, 0, 0]
                     else:
                         if j == i:
@@ -320,7 +297,7 @@ def A(b, I ,n , g):
         else:
             B1, B2 = [], []
             for j in range(1, v + 1):
-                if Vertices[j-2][-2]==0:
+                if Vertices[j-1][-2]==0:
                     if j==fl(i, g):
                         w=K*Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, -w]
@@ -356,30 +333,64 @@ def A(b, I ,n , g):
 
     return A
 
-#print(len(A(1,2,7,2)), len(A(1,2,7,2)[275]))
-# L=A(1,2,7,1)
-# for i in range(len(L)):
-#     print(len(L[i]))
+#Hermitization of the matrix
 
-# print(len(L))
-#  #Almost correct even though n extra points arrives univitedly
+# def Ah(b,I,n,g):
+#     Ah=[]
+#     L=A(b,I,n,g)
+#     for i in range(len(L)):
+#         Ah1=[]
+#         for j in range(len(L)):
+#             Ah1.append(complex(0,1)*L[i][j])
+#         Ah.append(Ah1)
+#     return Ah
 
-#Still little correction is needed to be done. The i part is absolutely correct
-#There should be exactly 280 points in the modified graph.
-#j part creates problem.
+# L=A(1,1,7,3)
+# v=len(L)
+# c=0
+# MM=[]
+# for i in range(v):
+#     if len(L[i])!=len(L):
+#         c+=1
+#         MM.append([i,len(L[i])])
+# print(c, MM)
 
-B=np.linspace(10,20,50)
+#Plotting th eigenspectrum
+
+B=np.linspace(0.01,10,100)
 E=[]
 for b in B:
-    Pfaff=np.array(A(b,5,7,2))
+    Pfaff=np.array(A(b,1,7,2))
     e0=eig(Pfaff)[0]
     e0c=np.imag(e0)
-    e1=[x for x in e0c if x>=0]
-    E.append(np.sort(e1))
+    #[x for x in e0c if x>=0]
+    #E.append(np.sort(e0c))
+    E.append(e0c)
+    #print(det(Pfaff))
 
-# print(E)
+#print(E)
+# Det=[]
+# v=len(E)
+# for i in range(v):
+#     p=1
+#     for e in E[i]:
+#         p=p*e 
+#     Det.append(p)
 
-plt.plot(B,E,'ro')
-plt.plot(B,B*0,b)
+# #print(Det)
+# count=0
+# for d in Det:
+#     if d==0:
+#         print(d)
+#         count+=1
+    
+#print(count)
+    
+plt.plot(B,E,'r+')
+plt.plot(B,B*0,'b')
+plt.xlabel("Beta--->")
+plt.ylabel("Eigenspectrum--->")
 plt.ylim([-10,10])
+plt.legend()
 plt.show()
+
