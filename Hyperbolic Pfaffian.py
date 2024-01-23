@@ -39,6 +39,22 @@ def f(n,c,j):
             return c+1
         else:
             return cmax(n,j-1)+1
+        
+#Determining signs layer by layer
+def Dir(n,s):
+    a=int((n-3)/2)
+    if s==1:
+        if a%2==0:
+           v=a
+        else:
+           v=a+1
+    else:
+        if a%2==0:
+           v=a-1
+        else:
+           v=a
+
+    return v
 
 #Construction of the (n,3) Hyperbolic graph with Pfaffian orientation
         
@@ -47,9 +63,9 @@ def Hyp(n, g):
     vertices_list=[[]]
     c = 0
 
-    for i in range(1,n+1):
-        if i < n:
-            c += 1
+    for i in range(1,n+1):  #This only works for n=odd. For even n we just need to tweak a little. The orientation in that case must be 
+        if i < n:           #similarly given as we have written for higher layers, i.e. odd number of edges have '1' orientation. The 
+            c += 1          #rest will follow similarly.
             vertices_list[0].append([i,c])
             E.append((c,c+1))
             Eo.append([(c,c+1),1])
@@ -77,7 +93,7 @@ def Hyp(n, g):
                             new_vertices.append(nv)
                             E.append((c,c+1)) # Putting conditions in order to construct Pfaffian orientation
                             sgn=Eo[E.index((c0,f(n,c0,j-1)))][1]
-                            if i<int((n-3)/2)+(1+sgn)/2:
+                            if i<Dir(n,sgn): #int((n-3)/2)+(1+sgn)/2:
                                Eo.append([(c,c+1),1])
                             else:
                                Eo.append([(c,c+1),-1])
@@ -101,7 +117,7 @@ def Hyp(n, g):
                             new_vertices.append(nv)
                             E.append((c,c+1))
                             sgn=Eo[E.index((c0,f(n,c0,j-1)))][1]
-                            if i<int((n-3)/2)+(1+sgn)/2:
+                            if i<Dir(n,sgn): #int((n-3)/2)+(1+sgn)/2:
                                 Eo.append([(c,c+1),1])
                             else:
                                 Eo.append([(c,c+1),-1])
@@ -320,8 +336,8 @@ def A(b, I ,n , g):
                         B2 += [w, 0]
                     else:
                         if j==i:
-                            B1+=[0,1]
-                            B2+=[-1,0]
+                            B1+=[0,-1]
+                            B2+=[1,0]
                         else:
                             if j>cmax(n,g-1):
                                 B1 += [0,0]
@@ -357,34 +373,13 @@ def A(b, I ,n , g):
 
 #Plotting th eigenspectrum
 
-B=np.linspace(0.01,10,100)
+B=np.linspace(0.01,1,100)
 E=[]
 for b in B:
-    Pfaff=np.array(A(b,1,7,2))
+    Pfaff=np.array(A(b,10,7,2))
     e0=eig(Pfaff)[0]
     e0c=np.imag(e0)
-    #[x for x in e0c if x>=0]
-    #E.append(np.sort(e0c))
     E.append(e0c)
-    #print(det(Pfaff))
-
-#print(E)
-# Det=[]
-# v=len(E)
-# for i in range(v):
-#     p=1
-#     for e in E[i]:
-#         p=p*e 
-#     Det.append(p)
-
-# #print(Det)
-# count=0
-# for d in Det:
-#     if d==0:
-#         print(d)
-#         count+=1
-    
-#print(count)
     
 plt.plot(B,E,'r+')
 plt.plot(B,B*0,'b')
