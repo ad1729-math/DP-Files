@@ -373,19 +373,43 @@ def A(b, I ,n , g):
 
 #Plotting th eigenspectrum
 
-B=np.linspace(0.01,1,100)
-E=[]
+B=np.linspace(0.1,10,100)
+E,E1,Pf,Pf1=[],[],[],[]
 for b in B:
-    Pfaff=np.array(A(b,10,7,2))
+    Pfaff=np.array(A(b,1,7,2))
+    Pfaff1=np.array(A(b,1,7,1))
     e0=eig(Pfaff)[0]
+    e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
+    e0c1=np.imag(e01)
+
+    p,p1=1,1
+    for e in e0c:
+        if e>=0:
+            p=p*e
+        else:
+            p=p
+
+    for e1 in e0c1:
+        if e1>=0:
+            p1=p1*e1
+        else:
+            p1=p1
+
     E.append(e0c)
+    E1.append(e0c1)
+    Pf.append(np.log(p))
+    Pf1.append(np.log(p1))
+
     
-plt.plot(B,E,'r+')
+# plt.plot(B,E,'r+')
+# plt.plot(B,E1,'r+')
+plt.plot(B,Pf,'g+')
+plt.plot(B,Pf1,'r+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
 plt.ylabel("Eigenspectrum--->")
-plt.ylim([-10,10])
+# plt.ylim([-10,10])
 plt.legend()
 plt.show()
 
