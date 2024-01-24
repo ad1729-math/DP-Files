@@ -69,23 +69,29 @@ def Hyp(n, g):
             vertices_list[0].append([i,c])
             E.append((c,c+1))
             Eo.append([(c,c+1),1])
+
         else:
             c += 1
             vertices_list[0].append([i,c])
             E.append((c,1))
             Eo.append([(c,1),1])
 
+
     for j in range(1,g+1):
+        Ver=vertices_list[j-1]
         new_vertices = []
-        for v in vertices_list[-1]:
+        En=[]
+
+        for v in Ver:
             c0=v[-1]
             if v[-2]!=0:
-                if v[-2]!=(n-4)*sigma(j-1):
+                if Ver[f(n,c0,j-1)-cmax(n,j-2)-1][-2]!=0:
                     for i in range(0, n-3):
                         c += 1
                         if i==0:
                            E.append((c0,c))
                            Eo.append([(c0,c),1])
+                           En.append(c)
                         if c<cmax(n,j):
                             nv = v[:-1]  # Remove the last element of v
                             nv.append(i)
@@ -374,42 +380,43 @@ def A(b, I ,n , g):
 #Plotting th eigenspectrum
 
 B=np.linspace(0.1,10,100)
-E,E1,Pf,Pf1=[],[],[],[]
+E,Pf=[],[]
+E1,Pf1=[],[]
 for b in B:
-    Pfaff=np.array(A(b,1,7,2))
-    Pfaff1=np.array(A(b,1,7,1))
+    Pfaff=np.array(A(b,1,7,3))
+    Pfaff1=np.array(A(b,1,7,2))
     e0=eig(Pfaff)[0]
     e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
     e0c1=np.imag(e01)
 
-    p,p1=1,1
-    for e in e0c:
-        if e>=0:
-            p=p*e
-        else:
-            p=p
+    # p,p1=1,1
+    # for e in e0c:
+    #     if e>=0:
+    #         p=p*e
+    #     else:
+    #         p=p
 
-    for e1 in e0c1:
-        if e1>=0:
-            p1=p1*e1
-        else:
-            p1=p1
+    # for e1 in e0c1:
+    #     if e1>=0:
+    #         p1=p1*e1
+    #     else:
+    #         p1=p1
 
     E.append(e0c)
     E1.append(e0c1)
-    Pf.append(np.log(p))
-    Pf1.append(np.log(p1))
+    # Pf.append(np.log(p))
+    #Pf1.append(np.log(p1))
 
     
-# plt.plot(B,E,'r+')
-# plt.plot(B,E1,'r+')
-plt.plot(B,Pf,'g+')
-plt.plot(B,Pf1,'r+')
+plt.plot(B,E,'r+')
+#plt.plot(B,E1,'g+')
+# plt.plot(B,Pf,'g+')
+# plt.plot(B,Pf1,'r+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
 plt.ylabel("Eigenspectrum--->")
 # plt.ylim([-10,10])
-plt.legend()
+#plt.legend()
 plt.show()
 
