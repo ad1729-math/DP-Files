@@ -56,6 +56,12 @@ def Dir(n,s):
 
     return v
 
+def s(n):
+    if (n/2)%2!=0:
+        return n/2
+    else:
+        return n/2+1
+    
 #Construction of the (n,3) Hyperbolic graph with Pfaffian orientation
         
 def Hyp(n, g):
@@ -63,19 +69,40 @@ def Hyp(n, g):
     vertices_list=[[]]
     c = 0
 
-    for i in range(1,n+1):  #This only works for n=odd. For even n we just need to tweak a little. The orientation in that case must be 
-        if i < n:           #similarly given as we have written for higher layers, i.e. odd number of edges have '1' orientation. The 
-            c += 1          #rest will follow similarly.
-            vertices_list[0].append([i,c])
-            E.append((c,c+1))
-            Eo.append([(c,c+1),1])
+    if n%2!=0:
+        for i in range(1,n+1):  #This only works for n=odd. For even n we just need to tweak a little. The orientation in that case must be 
+            if i < n:           #similarly given as we have written for higher layers, i.e. odd number of edges have '1' orientation. The 
+                c += 1          #rest will follow similarly.
+                vertices_list[0].append([i,c])
+                E.append((c,c+1))
+                Eo.append([(c,c+1),1])
 
-        else:
-            c += 1
-            vertices_list[0].append([i,c])
-            E.append((c,1))
-            Eo.append([(c,1),1])
+            else:
+                c += 1
+                vertices_list[0].append([i,c])
+                E.append((c,1))
+                Eo.append([(c,1),1])
 
+    else:
+        for i in range(1,n+1):   
+            if i < n: 
+                if i<=s(n):         
+                    c += 1         
+                    vertices_list[0].append([i,c])
+                    E.append((c,c+1))
+                    Eo.append([(c,c+1),1])
+                else:
+                    c += 1         
+                    vertices_list[0].append([i,c])
+                    E.append((c,c+1))
+                    Eo.append([(c,c+1),-1])
+
+            else:
+                c += 1
+                vertices_list[0].append([i,c])
+                E.append((c,1))
+                Eo.append([(c,1),-1])
+        
 
     for j in range(1,g+1):
         Ver=vertices_list[j-1]
@@ -142,11 +169,11 @@ def Hyp(n, g):
 #Picture of the hyperbolic lattice
 
 # a=int(input("Enter number of generations"))
-# E,Eo=Hyp(7,a)[1],Hyp(7,a)[2]
+# E,Eo=Hyp(6,a)[1],Hyp(6,a)[2]
 # G=nx.Graph(E)
 # G.add_edges_from(E)
 # nx.draw(G, with_labels=True)
-# print(E)
+# print(Eo)
 # #print(Hyp(7,a)[0])
 # plt.show()
 
@@ -367,24 +394,14 @@ def A(b, I ,n , g):
 #         Ah.append(Ah1)
 #     return Ah
 
-# L=A(1,1,7,3)
-# v=len(L)
-# c=0
-# MM=[]
-# for i in range(v):
-#     if len(L[i])!=len(L):
-#         c+=1
-#         MM.append([i,len(L[i])])
-# print(c, MM)
-
 #Plotting th eigenspectrum
 
-B=np.linspace(0.01,5,100)
+B=np.linspace(0.05,5,100)
 E,Pf=[],[]
 E1,Pf1=[],[]
 for b in B:
     Pfaff=np.array(A(b,1,7,3))
-    Pfaff1=np.array(A(b,1,7,2))
+    Pfaff1=np.array(A(b,1,9,2))
     e0=eig(Pfaff)[0]
     e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
