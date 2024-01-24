@@ -379,7 +379,7 @@ def A(b, I ,n , g):
 
 #Plotting th eigenspectrum
 
-B=np.linspace(0.1,10,100)
+B=np.linspace(0.01,5,100)
 E,Pf=[],[]
 E1,Pf1=[],[]
 for b in B:
@@ -410,7 +410,7 @@ for b in B:
 
     
 plt.plot(B,E,'r+')
-#plt.plot(B,E1,'g+')
+plt.plot(B,E1,'g+')
 # plt.plot(B,Pf,'g+')
 # plt.plot(B,Pf1,'r+')
 plt.plot(B,B*0,'b')
