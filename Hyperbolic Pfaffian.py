@@ -4,7 +4,32 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from numpy.linalg import eig, det
 
+
+def Metric(gen):
+    # if gen==g:
+    #     return 1
+    # else: 
+    #     return 10**-4
+
+    return 1/(1-np.tanh(gen/2)**2) #Scaling the interaction strength with metric
 #Total number points upto generation g
+
+
+def Layers(n,g):
+    if g==-1:
+        return 0,0,0,0
+    elif g==0:
+        return 0,n,0,n
+    else:
+        n0,n1,N0,N1=0,n,0,n
+        for i in range(1,g+1):
+            a,b=n0,n1
+            n0=b
+            n1=(n-4)*b-a
+            N0+=n0
+            N1+=n1
+        return n0,n1,N0,N1
+
 def cmax(n,g):
     if g==-1:
         return 0
@@ -180,7 +205,10 @@ def Hyp(n, g):
 #Building the Pfaffian matrix and calculate the eigenspectrum (May be Sturm sequnce method)
 
 def A(b, I ,n , g):
-    K=1/np.tanh(b*I)
+
+    def K(a):
+        return 1/np.tanh(b*I) # 1/np.tanh(b*I*Metric(a))
+    
     v=cmax(n,g)
     L=Hyp(n,g)
     Ver,Edges,Eo=L[0],L[1],L[2]
@@ -224,20 +252,20 @@ def A(b, I ,n , g):
                 if j <= cmax(n, g - 1):  # i,j both not last layers
                     if Vertices[i - 1][-2]!= 0:
                         if j==fl(i, gen):
-                            w=K*Eo[Edges.index((j, i))][1]
+                            w=K(gen)*Eo[Edges.index((j, i))][1]
                             B1 += [0, 0, -w]
                             B2 += [0, 0, 0]
                             B3 += [0, 0, 0]
                           
                         elif j==fr(i, gen):
-                            w=K*Eo[Edges.index((i, j))][1]
+                            w=K(gen)*Eo[Edges.index((i, j))][1]
                             B1 += [0, 0, 0]
                             B2 += [0, 0, 0]
                             B3 += [w, 0, 0]
                            
                         else:
                             if (i, j) in Edges:
-                                w=K*Eo[Edges.index((i, j))][1]
+                                w=K(gen)*Eo[Edges.index((i, j))][1]
                                 B1 += [0, 0, 0]
                                 B2 += [0, w, 0]
                                 B3 += [0, 0, 0]
@@ -255,20 +283,20 @@ def A(b, I ,n , g):
                                     
                     else:
                         if j == fl(i, gen):
-                            w = K * Eo[Edges.index((j, i))][1]
+                            w = K(gen)*Eo[Edges.index((j, i))][1]
                             B1 += [0, 0, -w]
                             B2 += [0, 0, 0]
                             B3 += [0, 0, 0]
                            
                         elif j == fr(i, gen):
-                            w = K * Eo[Edges.index((i, j))][1]
+                            w = K(gen)*Eo[Edges.index((i, j))][1]
                             B1 += [0, 0, 0]
                             B2 += [0, 0, 0]
                             B3 += [w, 0, 0]
                             
                         else:   
                             if (j, i) in Edges:
-                                w = K * Eo[Edges.index((j,i))][1]
+                                w = K(gen)*Eo[Edges.index((j,i))][1]
                                 B1 += [0, 0, 0]
                                 B2 += [0, -w, 0]
                                 B3 += [0, 0, 0]
@@ -288,9 +316,12 @@ def A(b, I ,n , g):
                         B1 += [0, 0]
                         B2 += [0, 0]
                         B3 += [0, 0]
+                        # B1 += [0, 0 ,0]
+                        # B2 += [0, 0 ,0]
+                        # B3 += [0, 0 ,0]
                     else:
                         if (i, j) in Edges:
-                            w=K*Eo[Edges.index((i,j))][1]
+                            w=K(gen)*Eo[Edges.index((i,j))][1]
                             B1 += [0, 0, 0]
                             B2 += [0, w, 0]
                             B3 += [0, 0, 0]
@@ -306,18 +337,18 @@ def A(b, I ,n , g):
             B1, B2, B3 = [], [], []
             for j in range(1, v + 1):
                 if j == fl(i, g):
-                    w = K*Eo[Edges.index((j, i))][1]
+                    w = K(g)*Eo[Edges.index((j, i))][1]
                     B1 += [0, -w]
                     B2 += [0, 0]
                     B3 += [0, 0]
                 elif j == fr(i, g):
-                    w = K * Eo[Edges.index((i, j))][1]
+                    w = K(g)*Eo[Edges.index((i, j))][1]
                     B1 += [0, 0]
                     B2 += [0, 0]
                     B3 += [w, 0]
                 else:
                     if (j, i) in Edges:
-                        w = K * Eo[Edges.index((j, i))][1]
+                        w = K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, 0]
                         B2 += [0, -w, 0]
                         B3 += [0, 0, 0]
@@ -344,15 +375,15 @@ def A(b, I ,n , g):
             A += [B1, B2, B3]
 
         else:
-            B1, B2 = [], []
+            B1, B2 = [], [] #Is to be changed to triangular modification and put in periodic boundary condtition
             for j in range(1, v + 1):
                 if Vertices[j-1][-2]==0:
                     if j==fl(i, g):
-                        w=K*Eo[Edges.index((j, i))][1]
+                        w=K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, -w]
                         B2 += [0, 0,  0]
                     elif j==fr(i, g):
-                        w=K*Eo[Edges.index((i, j))][1]
+                        w=K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0, 0, 0]
                         B2 += [w, 0, 0]
                     else:
@@ -360,11 +391,11 @@ def A(b, I ,n , g):
                         B2+=[0,0,0]
                 else:
                     if j==fl(i, g):
-                        w=K*Eo[Edges.index((j, i))][1]
+                        w=K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, -w]
                         B2 += [0, 0]
                     elif j==fr(i,g):
-                        w=K*Eo[Edges.index((i, j))][1]
+                        w=K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0,  0]
                         B2 += [w, 0]
                     else:
@@ -396,44 +427,47 @@ def A(b, I ,n , g):
 
 #Plotting th eigenspectrum
 
-B=np.linspace(0.05,5,100)
+n,g,I=8,3,1
+n1,g1,I1=7,3,1
+
+N=cmax(n,g)+Layers(n,g)[2]
+N1=cmax(n1,g1)+Layers(n1,g1)[2]
+
+B=np.linspace(0.001,5,100)
 E,Pf=[],[]
 E1,Pf1=[],[]
+
 for b in B:
-    Pfaff=np.array(A(b,1,7,3))
-    Pfaff1=np.array(A(b,1,9,2))
+    Pfaff=np.array(A(b,I,n,g))
+    Pfaff1=np.array(A(b,I1,n1,g1))
     e0=eig(Pfaff)[0]
     e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
     e0c1=np.imag(e01)
 
-    # p,p1=1,1
-    # for e in e0c:
-    #     if e>=0:
-    #         p=p*e
-    #     else:
-    #         p=p
-
-    # for e1 in e0c1:
-    #     if e1>=0:
-    #         p1=p1*e1
-    #     else:
-    #         p1=p1
+    s0=0
+    for e in e0c:
+        if e>=0:
+           s0 +=np.log(e)
+  
+    s1=0
+    for e1 in e0c1: 
+        if e1>=0:
+           s1 +=np.log(e1)
 
     E.append(e0c)
     E1.append(e0c1)
-    # Pf.append(np.log(p))
-    #Pf1.append(np.log(p1))
+    Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
+    Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
 
     
-plt.plot(B,E,'r+')
-plt.plot(B,E1,'g+')
-# plt.plot(B,Pf,'g+')
-# plt.plot(B,Pf1,'r+')
+#plt.plot(B,E,'r+')
+#plt.plot(B,E1,'g+')
+plt.plot(B,Pf,'r+')
+plt.plot(B,Pf1,'g+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
 plt.ylabel("Eigenspectrum--->")
 # plt.ylim([-10,10])
 #plt.legend()
 plt.show()
-
