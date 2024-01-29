@@ -4,7 +4,7 @@ import networkx as nx
 import matplotlib.pyplot as plt 
 from numpy.linalg import eig, det
 
-gc,d=1,6
+gc=1
 
 # def SqLat(m,n):
 #     C,Lat,E,Eo=[],[],[],[]
@@ -129,7 +129,7 @@ def s(n):
 
 #Construction of the (n,3) Hyperbolic graph with Pfaffian orientation
         
-def Hyp_corr(n, g):
+def Hyp_corr(n, g,gc,d):
 
     #Modifications for finding the correlation
     x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+3+d+1
@@ -249,7 +249,7 @@ def Hyp_corr(n, g):
 
 #Building the Pfaffian matrix and calculate the eigenspectrum (May be Sturm sequnce method)
 
-def A(b, I ,n , g):
+def A(b, I , n , g , gc, d):
 
     x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+3+d+1
 
@@ -257,7 +257,7 @@ def A(b, I ,n , g):
         return 1/np.tanh(b*I) # 1/np.tanh(b*I*Metric(a))
     
     v=cmax(n,g)
-    L=Hyp_corr(n,g)
+    L=Hyp_corr(n,g ,gc,d)
     Ver,Edges,Eo=L[0],L[1],L[2]
     A=[]
 
@@ -487,9 +487,9 @@ def A(b, I ,n , g):
                             if Vertices[i - 1][-2]!= 0:
                                 if j==fl(i, gen):
                                     w=K(gen)*Eo[Edges.index((j, i))][1]
-                                    B1 += [0, 0, -w,0,0,0]
-                                    B2 += [0, 0, 0,0,0,0]
-                                    B3 += [0, 0, 0,0,0,0]
+                                    B1 += [0, 0, -w, 0, 0, 0]
+                                    B2 += [0, 0, 0, 0, 0, 0]
+                                    B3 += [0, 0, 0, 0, 0, 0]
                                 
                                 elif j==fr(i, gen):
                                     w=K(gen)*Eo[Edges.index((i, j))][1]
@@ -719,18 +719,7 @@ def A(b, I ,n , g):
 
 #Hermitization of the matrix
 
-# E=A(1,1,6,2)
-# Ei=np.imag(eig(np.array(E))[0])
-
-# Epos=[]
-# for e in Ei:
-#     if e>=0:
-#         Epos.append(e)
-
-# print(Epos)
-
-
-# def Ah(b,I,n,g):
+# def Ah(b,I,n,g ,gc,d):
 #     Ah=[]
 #     L=A(b,I,n,g)
 #     for i in range(len(L)):
@@ -743,47 +732,57 @@ def A(b, I ,n , g):
 #Plotting th eigenspectrum
 
 n,g,I=7,3,1
-#n1,g1,I1=7,3,1
+n1,g1,I1=6,4,1
 
 N=cmax(n,g)+Layers(n,g)[2]
-#N1=cmax(n1,g1)+Layers(n1,g1)[2]
+N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(0.01,10,100)
+B=np.linspace(0.001,10,100)
 E,Pf=[],[]
-#E1,Pf1=[],[]
+E1,Pf1=[],[]
 
 for b in B:
-    Pfaff=np.array(A(b,I,n,g))
-   # Pfaff1=np.array(A(b,I1,n1,g1))
+    Pfaff=np.array(A(b,I,n,g,1,4))
+    #Pfaff1=np.array(A(b,I,n,g,1,4))
+    Pfaff1=np.array(A(b,I1,n1,g1,1,4))
     e0=eig(Pfaff)[0]
-   # e01=eig(Pfaff1)[0]
+    e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
-   # e0c1=np.imag(e01)
+    e0c1=np.imag(e01)
+
+    Z0_log=N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)
+    Z1_log=N1*np.log(np.sinh(b*I))+cmax(n1,g)*np.log(2)
 
     s0=0
     for e in e0c:
         if e==0:
            s0=0
+           In=0
            break 
         elif e>0:
+           In=1
            s0+=np.log(e)
         
-    Z0_log=N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)
-     
-    # s1=0
-    # for e1 in e0c1: 
-    #     if e1>=0:
-    #        s1 +=np.log(e1)
 
+    s1=0
+    for e1 in e0c1:
+        if e1==0:
+           s1=0
+           In1=0
+           break 
+        elif e1>0:
+           In1=1
+           s1+=np.log(e1)
+ 
     E.append(e0c)
-    #E1.append(e0c1)
-    #Pf.append(s0+Z0_log)
-   # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
+    E1.append(e0c1)
+    Pf.append((s0+Z0_log)*In)
+    Pf1.append((s1+Z1_log)*In1)
     
-plt.plot(B,E,'r+')
+#plt.plot(B,E,'r+')
 #plt.plot(B,E1,'g+')
-#plt.plot(B,Pf,'r+')
-#plt.plot(B,Pf1,'g+')
+plt.plot(B,Pf,'r+')
+plt.plot(B,Pf1,'g+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
 plt.ylabel("Eigenspectrum--->")
