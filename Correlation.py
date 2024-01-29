@@ -132,7 +132,7 @@ def s(n):
 def Hyp_corr(n, g):
 
     #Modifications for finding the correlation
-    x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+d+1
+    x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+3+d+1
 
     E,Eo = [],[]  #Edges and edges with orientations
     vertices_list=[[]]
@@ -176,7 +176,6 @@ def Hyp_corr(n, g):
     for j in range(1,g+1):
         Ver=vertices_list[j-1]
         new_vertices = []
-        En=[]
         
         for v in Ver:
             c0=v[-1]
@@ -190,7 +189,6 @@ def Hyp_corr(n, g):
                               Eo.append([(c0,c),-1])
                            else:
                               Eo.append([(c0,c),1])
-                           En.append(c)
                         if c<cmax(n,j):
                             nv = v[:-1]  # Remove the last element of v
                             nv.append(i)
@@ -253,7 +251,7 @@ def Hyp_corr(n, g):
 
 def A(b, I ,n , g):
 
-    x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+d+1
+    x0,y0=cmax(n,gc-1)+3,cmax(n,gc-1)+3+d+1
 
     def K(a):
         return 1/np.tanh(b*I) # 1/np.tanh(b*I*Metric(a))
@@ -299,6 +297,7 @@ def A(b, I ,n , g):
             if i==x0:  #X point
                
                 B1,B2,B3,B4,B5,B6=[],[],[],[],[],[]
+
                 for j in range(1, v + 1):
                     if j <= cmax(n, g - 1):  # i,j both not last layer
                         if j==fl(i, gen):
@@ -331,13 +330,13 @@ def A(b, I ,n , g):
 
                             else:
                                 if j == i:
-                                    v0=1/K(gen)
+                                    v0=1
                                     B1 += [0, 0, 0, -v0, 0, 0]
-                                    B2 += [0, 0, 0, 0, -v0, 0]
+                                    B2 += [0, 0, 0, 0, v0, 0]
                                     B3 += [0, 0, 0, 0, 0,  v0]
-                                    B4 += [1, 0, 0, 0, 1,  -1]
-                                    B5 += [0, 1, 0, -1, 0,  1]
-                                    B6 += [0, 0, -1, 1, -1, 0]
+                                    B4 += [v0, 0, 0, 0, 1,  -1]
+                                    B5 += [0, -v0, 0, -1, 0,  1]
+                                    B6 += [0, 0, -v0, 1, -1, 0]
                                     
                                 else:
                                     if j==y0:
@@ -422,13 +421,13 @@ def A(b, I ,n , g):
 
                             else:
                                 if j == i:
-                                    v0=1/K(gen)
+                                    v0=1
                                     B1 += [0, 0, 0, -v0, 0, 0]
-                                    B2 += [0, 0, 0, 0,  v0, 0]
+                                    B2 += [0, 0, 0, 0,  -v0, 0]
                                     B3 += [0, 0, 0, 0, 0, v0]
-                                    B4 += [1, 0, 0, 0, 1, -1]
-                                    B5 += [0, 1, 0, -1, 0, 1]
-                                    B6 += [0, 0, -1, 1, -1, 0]
+                                    B4 += [v0, 0, 0, 0, 1, -1]
+                                    B5 += [0, v0, 0, -1, 0, 1]
+                                    B6 += [0, 0, -v0, 1, -1, 0]
                                     
                                 else:
                                     if j==x0:
@@ -484,7 +483,7 @@ def A(b, I ,n , g):
             
                 for j in range(1, v + 1):
                     if j <= cmax(n, g - 1):  # i,j both not last layers
-                        if j==x0 or y0: 
+                        if j==x0 or j==y0: 
                             if Vertices[i - 1][-2]!= 0:
                                 if j==fl(i, gen):
                                     w=K(gen)*Eo[Edges.index((j, i))][1]
@@ -677,7 +676,7 @@ def A(b, I ,n , g):
             B1, B2 = [], [] #Is to be changed to triangular modification and put in periodic boundary condtition
             for j in range(1, v + 1):
 
-                if j==x0 or y0:
+                if j==x0 or j==y0:
                    B1 +=[0,0,0,0,0,0]
                    B2 +=[0,0,0,0,0,0]
 
@@ -720,6 +719,17 @@ def A(b, I ,n , g):
 
 #Hermitization of the matrix
 
+# E=A(1,1,6,2)
+# Ei=np.imag(eig(np.array(E))[0])
+
+# Epos=[]
+# for e in Ei:
+#     if e>=0:
+#         Epos.append(e)
+
+# print(Epos)
+
+
 # def Ah(b,I,n,g):
 #     Ah=[]
 #     L=A(b,I,n,g)
@@ -732,54 +742,52 @@ def A(b, I ,n , g):
 
 #Plotting th eigenspectrum
 
-E=A(1,1,7,2)
+n,g,I=7,3,1
+#n1,g1,I1=7,3,1
 
-print(len(E))
+N=cmax(n,g)+Layers(n,g)[2]
+#N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-for i in range(len(E)):
-    print(len(E[i]))
-# n,g,I=6,2,1
-# #n1,g1,I1=7,3,1
+B=np.linspace(0.01,10,100)
+E,Pf=[],[]
+#E1,Pf1=[],[]
 
-# N=cmax(n,g)+Layers(n,g)[2]
-# #N1=cmax(n1,g1)+Layers(n1,g1)[2]
+for b in B:
+    Pfaff=np.array(A(b,I,n,g))
+   # Pfaff1=np.array(A(b,I1,n1,g1))
+    e0=eig(Pfaff)[0]
+   # e01=eig(Pfaff1)[0]
+    e0c=np.imag(e0)
+   # e0c1=np.imag(e01)
 
-# B=np.linspace(0.01,5,100)
-# E,Pf=[],[]
-# #E1,Pf1=[],[]
+    s0=0
+    for e in e0c:
+        if e==0:
+           s0=0
+           break 
+        elif e>0:
+           s0+=np.log(e)
+        
+    Z0_log=N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)
+     
+    # s1=0
+    # for e1 in e0c1: 
+    #     if e1>=0:
+    #        s1 +=np.log(e1)
 
-# for b in B:
-#     Pfaff=np.array(A(b,I,n,g))
-#    # Pfaff1=np.array(A(b,I1,n1,g1))
-#     e0=eig(Pfaff)[0]
-#    # e01=eig(Pfaff1)[0]
-#     e0c=np.imag(e0)
-#    # e0c1=np.imag(e01)
-
-#     s0=0
-#     for e in e0c:
-#         if e>=0:
-#            s0 +=np.log(e)
-  
-#     # s1=0
-#     # for e1 in e0c1: 
-#     #     if e1>=0:
-#     #        s1 +=np.log(e1)
-
-#     E.append(e0c)
-#     #E1.append(e0c1)
-#     Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
-#    # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
-
+    E.append(e0c)
+    #E1.append(e0c1)
+    #Pf.append(s0+Z0_log)
+   # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
     
-# #plt.plot(B,E,'r+')
-# #plt.plot(B,E1,'g+')
-# plt.plot(B,Pf,'r+')
-# #plt.plot(B,Pf1,'g+')
-# plt.plot(B,B*0,'b')
-# plt.xlabel("Beta--->")
-# plt.ylabel("Eigenspectrum--->")
-# # plt.ylim([-10,10])
-# #plt.legend()
-# plt.show()
+plt.plot(B,E,'r+')
+#plt.plot(B,E1,'g+')
+#plt.plot(B,Pf,'r+')
+#plt.plot(B,Pf1,'g+')
+plt.plot(B,B*0,'b')
+plt.xlabel("Beta--->")
+plt.ylabel("Eigenspectrum--->")
+# plt.ylim([-10,10])
+#plt.legend()
+plt.show()
 
