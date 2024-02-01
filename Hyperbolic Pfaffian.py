@@ -425,62 +425,56 @@ def A(b, I ,n , g):
 #         Ah.append(Ah1)
 #     return Ah
 
-#Plotting th eigenspectrum
+# Plotting th eigenspectrum
 
-# n,g,I=6,6,1
-# n1,g1,I1=7,3,1
+n,g,I=6,6,1
+n1,g1,I1=7,3,1
 
-# N=cmax(n,g)+Layers(n,g)[2]
-# N1=cmax(n1,g1)+Layers(n1,g1)[2]
+N=cmax(n,g)+Layers(n,g)[2]
+N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-# B=np.linspace(0.001,5,100)
-# E,Pf=[],[]
-# #E1,Pf1=[],[]
+B=np.linspace(0.01,5,100)
+E,Pf=[],[]
+#E1,Pf1=[],[]
 
-# for b in B:
-#     Pfaff=np.array(A(b,I,n,g))
-#     #Pfaff1=np.array(A(b,I1,n1,g1))
-#     e0=eig(Pfaff)[0]
-#     #e01=eig(Pfaff1)[0]
-#     e0c=np.imag(e0)
-#     #e0c1=np.imag(e01)
+for b in B:
+    Pfaff=np.array(A(b,I,n,g))
+    #Pfaff1=np.array(A(b,I1,n1,g1))
+    e0=eig(Pfaff)[0]
+    #e01=eig(Pfaff1)[0]
+    e0c=np.imag(e0)
+    #e0c1=np.imag(e01)
 
-#     s0=0
-#     for e in e0c:
-#         if e>=0:
-#            s0 +=np.log(e)
+    s0=0
+    for e in e0c:
+        if e>=0:
+           s0 +=np.log(e)
   
-#     # s1=0
-#     # for e1 in e0c1: 
-#     #     if e1>=0:
-#     #        s1 +=np.log(e1)
+    # s1=0
+    # for e1 in e0c1: 
+    #     if e1>=0:
+    #        s1 +=np.log(e1)
 
-#     E.append(e0c)
-#     #E1.append(e0c1)
-#     Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
-#     #Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
+    E.append(e0c)
+    #E1.append(e0c1)
+    Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
+    #Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
 
-    
-# #plt.plot(B,E,'r+')
-# #plt.plot(B,E1,'g+')
-# plt.plot(B,Pf,'r+')
-# #plt.plot(B,Pf1,'g+')
-# plt.plot(B,B*0,'b')
-# plt.xlabel("Beta--->")
-# plt.ylabel("Eigenspectrum--->")
-# # plt.ylim([-10,10])
-# #plt.legend()
-# plt.show()
+def Upper_bound(b):
+    return (1/np.tanh(b*I)+2)
+
+plt.plot(B,E,'r+')
+#plt.plot(B,E1,'g+')
+#plt.plot(B,Pf,'r+')
+plt.plot(B,Upper_bound(B),'b')
+plt.plot(B,-Upper_bound(B),'b')
+#plt.plot(B,Pf1,'g+')
+plt.plot(B,B*0,'b')
+plt.xlabel("Beta--->")
+plt.ylabel("Eigenspectrum--->")
+# plt.ylim([-10,10])
+#plt.legend()
+plt.show()
 
 
-E=A(5,5,10,0)
-Ei=np.imag(eig(np.array(E))[0])
 
-#Epos=[]
-p=1
-for e in Ei:
-    if e>=0:
-        p=p*e
-      #  Epos.append(e)
-
-print(p)
