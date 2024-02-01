@@ -314,11 +314,12 @@ def A(b, I ,n , g):
                 else:  # j is in the last layer
                     if Vertices[j - 1][-2]!= 0:
                         B1 += [0, 0]
-                        B2 += [0, 0]
+                        B2 += [0, 0] #Asymmetric boundary condition
                         B3 += [0, 0]
-                        # B1 += [0, 0 ,0]
-                        # B2 += [0, 0 ,0]
-                        # B3 += [0, 0 ,0]
+                        
+                        # B1 += [0, 0, 0, 0]
+                        # B2 += [0, 0, 0, 0]
+                        # B3 += [0, 0, 0, 0]
                     else:
                         if (i, j) in Edges:
                             w=K(gen)*Eo[Edges.index((i,j))][1]
@@ -341,11 +342,19 @@ def A(b, I ,n , g):
                     B1 += [0, -w]
                     B2 += [0, 0]
                     B3 += [0, 0]
+
+                    # B1 += [0, 0, -w, 0]
+                    # B2 += [0, 0, 0, 0]
+                    # B3 += [0, 0, 0, 0]
                 elif j == fr(i, g):
                     w = K(g)*Eo[Edges.index((i, j))][1]
                     B1 += [0, 0]
                     B2 += [0, 0]
                     B3 += [w, 0]
+
+                    # B1 += [0, 0, 0, 0]
+                    # B2 += [0, 0, 0, 0]
+                    # B3 += [w, 0, 0, 0]
                 else:
                     if (j, i) in Edges:
                         w = K(g)*Eo[Edges.index((j, i))][1]
@@ -367,6 +376,10 @@ def A(b, I ,n , g):
                                     B1 += [0, 0]
                                     B2 += [0, 0]
                                     B3 += [0, 0]
+
+                                    # B1 += [0, 0, 0, 0]
+                                    # B2 += [0, 0, 0, 0]
+                                    # B3 += [0, 0, 0, 0]
                             else:
                                 B1 += [0, 0, 0]
                                 B2 += [0, 0, 0]
@@ -376,40 +389,85 @@ def A(b, I ,n , g):
 
         else:
             B1, B2 = [], [] #Is to be changed to triangular modification and put in periodic boundary condtition
+
+            #B1,B2,B3,B4=[],[],[],[]
+
             for j in range(1, v + 1):
                 if Vertices[j-1][-2]==0:
                     if j==fl(i, g):
                         w=K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, -w]
                         B2 += [0, 0,  0]
+
+                        # B1 += [0, 0, -w]
+                        # B2 += [0, 0,  0]
+                        # B3 += [0, 0, 0]
+                        # B4 += [0, 0, 0]
                     elif j==fr(i, g):
                         w=K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0, 0, 0]
                         B2 += [w, 0, 0]
+
+                        # B1 += [0, 0, 0]
+                        # B2 += [0, 0,  0]
+                        # B3 += [w, 0, 0]
+                        # B4 += [0, 0, 0]
                     else:
                         B1+=[0,0,0]
                         B2+=[0,0,0]
+
+                        # B1+=[0,0,0]
+                        # B2+=[0,0,0]
+                        # B3+=[0,0,0]
+                        # B4+=[0,0,0]
                 else:
                     if j==fl(i, g):
                         w=K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, -w]
                         B2 += [0, 0]
+
+                        # B1+=[0,0,-w,0]
+                        # B2+=[0,0,0,0]
+                        # B3+=[0,0,0,0]
+                        # B4+=[0,0,0,0]
                     elif j==fr(i,g):
                         w=K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0,  0]
                         B2 += [w, 0]
+
+                        # B1+=[0,0,0,0]
+                        # B2+=[0,0,0,0]
+                        # B3+=[w,0,0,0]
+                        # B4+=[0,0,0,0]
                     else:
                         if j==i:
                             B1+=[0,-1]
                             B2+=[1,0]
+
+                            # B1+=[0,1,-1,0]
+                            # B2+=[-1,0,1,1]
+                            # B3+=[1,-1,0,0]
+                            # B4+=[0,-1,0,0]
                         else:
                             if j>cmax(n,g-1):
                                 B1 += [0,0]
                                 B2 += [0,0]
+
+                                # B1+=[0,0,0,0]
+                                # B2+=[0,0,0,0]
+                                # B3+=[0,0,0,0]
+                                # B4+=[0,0,0,0]
                             else:
                                 B1 += [0,0,0]
                                 B2 += [0,0,0]
-            A += [B1, B2]
+
+                                # B1 += [0,0,0]
+                                # B2 += [0,0,0]
+                                # B3 += [0,0,0]
+                                # B4 += [0,0,0]
+
+            A +=[B1, B2]
+            #A += [B1, B2, B3, B4]
 
     return A
 
@@ -427,7 +485,7 @@ def A(b, I ,n , g):
 
 # Plotting th eigenspectrum
 
-n,g,I=6,6,1
+n,g,I=7,2,1
 n1,g1,I1=7,3,1
 
 N=cmax(n,g)+Layers(n,g)[2]
@@ -460,14 +518,9 @@ for b in B:
     Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
     #Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
 
-def Upper_bound(b):
-    return (1/np.tanh(b*I)+2)
-
 plt.plot(B,E,'r+')
 #plt.plot(B,E1,'g+')
 #plt.plot(B,Pf,'r+')
-plt.plot(B,Upper_bound(B),'b')
-plt.plot(B,-Upper_bound(B),'b')
 #plt.plot(B,Pf1,'g+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
