@@ -363,6 +363,7 @@ def A(b, I , n , g , gc, d):
                             B4 += [0, 0]
                             B5 += [0, 0]
                             B6 += [0, 0]
+
                             # B1 += [0, 0 ,0]
                             # B2 += [0, 0 ,0]
                             # B3 += [0, 0 ,0]
@@ -732,38 +733,38 @@ def A(b, I , n , g , gc, d):
 #Plotting th eigenspectrum
 
 n,g,I=7,3,1
-n1,g1,I1=6,4,1
+n1,g1,I1=7,3,1
 
 N=cmax(n,g)+Layers(n,g)[2]
 N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(0.001,10,100)
+B=np.linspace(10**-6,10**-2,100)
 E,Pf=[],[]
 E1,Pf1=[],[]
-
+B0=[]
 for b in B:
-    Pfaff=np.array(A(b,I,n,g,1,4))
+    Pfaff=np.array(A(b,I,n,g,1,3))
     #Pfaff1=np.array(A(b,I,n,g,1,4))
-    Pfaff1=np.array(A(b,I1,n1,g1,1,4))
+    Pfaff1=np.array(A(b,I1,n1,g1,1,5))
     e0=eig(Pfaff)[0]
     e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
     e0c1=np.imag(e01)
 
     Z0_log=N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)
-    Z1_log=N1*np.log(np.sinh(b*I))+cmax(n1,g)*np.log(2)
+    Z1_log=N1*np.log(np.sinh(b*I))+cmax(n1,g1)*np.log(2)
 
     s0=0
     for e in e0c:
         if e==0:
            s0=0
            In=0
+           B0.append(b)
            break 
         elif e>0:
            In=1
            s0+=np.log(e)
-        
-
+    
     s1=0
     for e1 in e0c1:
         if e1==0:
@@ -774,8 +775,8 @@ for b in B:
            In1=1
            s1+=np.log(e1)
  
-    E.append(e0c)
-    E1.append(e0c1)
+    #E.append(e0c)
+   #E1.append(e0c1)
     Pf.append((s0+Z0_log)*In)
     Pf1.append((s1+Z1_log)*In1)
     

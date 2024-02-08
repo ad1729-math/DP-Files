@@ -322,7 +322,7 @@ def A(b, I ,n , g):
                         # B3 += [0, 0, 0, 0]
                     else:
                         if (i, j) in Edges:
-                            w=K(gen)*Eo[Edges.index((i,j))][1]
+                            w= K(gen)*Eo[Edges.index((i,j))][1]
                             B1 += [0, 0, 0]
                             B2 += [0, w, 0]
                             B3 += [0, 0, 0]
@@ -395,7 +395,7 @@ def A(b, I ,n , g):
             for j in range(1, v + 1):
                 if Vertices[j-1][-2]==0:
                     if j==fl(i, g):
-                        w=K(g)*Eo[Edges.index((j, i))][1]
+                        w= K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, 0, -w]
                         B2 += [0, 0,  0]
 
@@ -404,7 +404,7 @@ def A(b, I ,n , g):
                         # B3 += [0, 0, 0]
                         # B4 += [0, 0, 0]
                     elif j==fr(i, g):
-                        w=K(g)*Eo[Edges.index((i, j))][1]
+                        w= K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0, 0, 0]
                         B2 += [w, 0, 0]
 
@@ -422,7 +422,7 @@ def A(b, I ,n , g):
                         # B4+=[0,0,0]
                 else:
                     if j==fl(i, g):
-                        w=K(g)*Eo[Edges.index((j, i))][1]
+                        w= K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, -w]
                         B2 += [0, 0]
 
@@ -431,7 +431,7 @@ def A(b, I ,n , g):
                         # B3+=[0,0,0,0]
                         # B4+=[0,0,0,0]
                     elif j==fr(i,g):
-                        w=K(g)*Eo[Edges.index((i, j))][1]
+                        w= K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0,  0]
                         B2 += [w, 0]
 
@@ -485,13 +485,13 @@ def A(b, I ,n , g):
 
 # Plotting th eigenspectrum
 
-n,g,I=7,2,1
+n,g,I=7,3,1
 n1,g1,I1=7,3,1
 
 N=cmax(n,g)+Layers(n,g)[2]
 N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(0.01,5,100)
+B=np.linspace(0.001,5,100)
 E,Pf=[],[]
 #E1,Pf1=[],[]
 
@@ -515,12 +515,12 @@ for b in B:
 
     E.append(e0c)
     #E1.append(e0c1)
-    Pf.append(s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))
+    Pf.append((s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))*10**-2)
     #Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
 
 plt.plot(B,E,'r+')
 #plt.plot(B,E1,'g+')
-#plt.plot(B,Pf,'r+')
+plt.plot(B,Pf,'g+')
 #plt.plot(B,Pf1,'g+')
 plt.plot(B,B*0,'b')
 plt.xlabel("Beta--->")
