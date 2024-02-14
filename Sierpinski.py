@@ -15,9 +15,9 @@ def Sier(b,J,n):
             B0=[]
             for j in range(m):
                 if i==0 and j==m-1: 
-                    B0.append(w)
+                    B0.append(1)
                 elif i==m-1 and j==0:
-                    B0.append(-w)
+                    B0.append(-1)
                 else:
                     B0.append(0)
             B.append(B0)
