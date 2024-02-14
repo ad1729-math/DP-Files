@@ -16,11 +16,11 @@ def Sier(b,J,n):
             for j in range(m):
                 if i==0 and j==m-1: 
                     B0.append(1)
-                elif i==m-1 and j==0:
-                    B0.append(-1)
                 else:
                     B0.append(0)
             B.append(B0)
+
+        BT=np.transpose(B)
 
         for i in range(3*m):
             Am=[]
@@ -31,10 +31,10 @@ def Sier(b,J,n):
                     elif m<=j<2*m:
                         Am.append(B[i][j-m])
                     else:
-                        Am.append(B[i][j-2*m])
+                        Am.append(-BT[i][j-2*m])
                 elif m<=i<2*m: 
                     if j<m:
-                       Am.append(B[i-m][j])
+                       Am.append(-BT[i-m][j])
                     elif m<=j<2*m:
                         Am.append(A1[i-m][j-m])
                     else:
@@ -43,7 +43,7 @@ def Sier(b,J,n):
                     if j<m:
                        Am.append(B[i-2*m][j])
                     elif m<=j<2*m:
-                        Am.append(B[i-2*m][j-m])
+                        Am.append(-BT[i-2*m][j-m])
                     else:
                         Am.append(A1[i-2*m][j-2*m])
 
@@ -53,7 +53,7 @@ def Sier(b,J,n):
 
     return A1
     
-n,J=5,1
+n,J=4,1
 B=np.linspace(0.01,5,100)
 E,Z=[],[]
 for b in B:
@@ -81,4 +81,10 @@ plt.plot(B,B*0,'b')
 plt.show()
 
 
+# E=np.imag(eig(np.array(Sier(10,10,1)))[0]) 
+# p=1 
+# for e in E:
+#     if e>=0: 
+#         p=p*e 
 
+# print(p)
