@@ -1119,27 +1119,27 @@ def A(b, I ,n , g):
 
 #Plotting the eigenspectrum
 
-n,g,I=7,2,1
-n1,g1,I1=7,2,1
+n,g,I=7,3,-1
+n1,g1,I1=7,3,-1
 
 N=cmax(n,g)+Layers(n,g)[2]
 N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(10**-1,1.5,100)
+B=np.linspace(10**-1,5,5)
 E,LC,Corr=[],[],[]
 E1,LC1,Corr1=[],[],[]
 B0=[]
 
 for b in B:
     Pfaff=np.array(ACorr(b,I,n,g,1,3))
-    Pfaff1=np.array(ACorr(b,I1,n1,g1,1,5))
+    Pfaff1=np.array(ACorr(b,I1,n1,g1,1,8))
     e0=eig(Pfaff)[0]
     e01=eig(Pfaff1)[0]
     e0c=np.imag(e0)
     e0c1=np.imag(e01)   
 
-    Z0_log=N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)
-    Z1_log=N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2)
+    Z0_log=N*np.log(np.sinh(b*abs(I)))+cmax(n,g)*np.log(2)
+    Z1_log=N1*np.log(np.sinh(b*abs(I1)))+cmax(n1,g1)*np.log(2)
 
     s0=0
     for e in e0c:
@@ -1161,11 +1161,11 @@ for b in B:
         if h>=0:
            sum+=np.log(h)
 
-    # s1=0
-    # for e1 in e0c1: 
-    #     if e1>=0:
-    #        s1 +=np.log(e1)
-    # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
+    s1=0
+    for e1 in e0c1: 
+        if e1>=0:
+           s1 +=np.log(e1)
+  #  Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
     
     E.append(e0c)
     E1.append(e0c1)
