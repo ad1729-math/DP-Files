@@ -207,6 +207,10 @@ def Hyp(n, g):
                               E.append((c0,c))
                               Eo.append([(c0,c),1])
                               En.append(c)
+                              nv = v[:-1]  # Remove the last element of v
+                              nv.append(i)
+                              nv.append(c)
+                              new_vertices.append(nv)
                             if c<cmax(n,j):
                                 nv = v[:-1]  # Remove the last element of v
                                 nv.append(i)
@@ -229,6 +233,11 @@ def Hyp(n, g):
                         c+=1
                         E.append((c0,c))
                         Eo.append([(c0,c),1])
+                        nv = v[:-1]  # Remove the last element of v
+                        nv.append(0)
+                        nv.append(c)
+                        new_vertices.append(nv)
+
             vertices_list.append(new_vertices)
 
     return vertices_list, E , Eo      
@@ -242,27 +251,7 @@ def Hyp(n, g):
 # #print(Hyp(7,a)[0])
 # plt.show()
 
-n,g=7,2
-
-L0=Hyp(n,g)
-Ver,Edges,Eo=L0[0],L0[1],L0[2]
-v=cmax_ac(n,g)
-A=[]
-
-Vertices=[]
-for j in range(0,g+1):
-    for vals in Ver[j]:
-        Vertices.append(vals)
-
-R,L=[],[]
-for i in range(cmax(n,g-1)+1,v+1): 
-    if (i,i+1) not in Edges: 
-        R.append(i)
-    elif (i-1,i) not in Edges: 
-        L.append(i)
-
-    
-print(R,L)
+#print(Hyp(7,2)[0])
 
 
 
@@ -272,6 +261,7 @@ def A_ac(b,I,n,g):
     
     L=Hyp(n,g)
     Ver,Edges,Eo=L[0],L[1],L[2]
+    v=cmax_ac(n,g)
 
     A=[]
 
@@ -292,10 +282,13 @@ def A_ac(b,I,n,g):
            if i==1:
                return n
            else: return i-1
-        else: 
+        elif j<g: 
             if i==cmax(n,j-1)+1:
                 return cmax(n,j)
             else:
+                return i-1
+        else: 
+            if i not in L: 
                 return i-1
     
     def fr(i,j):
@@ -305,12 +298,17 @@ def A_ac(b,I,n,g):
            else: 
                return 1
 
-        else: 
+        elif j<g: 
             if i==cmax(n,j):
                 return cmax(n,j-1)+1
             else:
                 return i+1
+        
+        else: 
+            if i not in R:
+                return i+1
     
+    RL=R+L
     
 
 # #Modifying the graph with Fisher construction
@@ -388,157 +386,224 @@ def A_ac(b,I,n,g):
                         B1 += [0, 0]
                         B2 += [0, 0] #Asymmetric boundary condition
                         B3 += [0, 0]
-                        
-                        # B1 += [0, 0, 0, 0]
-                        # B2 += [0, 0, 0, 0]
-                        # B3 += [0, 0, 0, 0]
+
                     else:
                         if (i, j) in Edges:
                             w= K(gen)*Eo[Edges.index((i,j))][1]
-                            B1 += [0, 0, 0]
-                            B2 += [0, w, 0]
-                            B3 += [0, 0, 0]
+                            if j in L:
+                                B1 +=[0,0]
+                                B2 +=[w,0]
+                                B3 +=[0,0]  
+
+                            elif j in R: 
+                                B1 +=[0,0]
+                                B2 +=[0,w]
+                                B3 +=[0,0]
+
+                            else:
+                                B1 += [0, 0, 0]
+                                B2 += [0, w, 0]
+                                B3 += [0, 0, 0]
                         else:
-                            B1 += [0, 0, 0]
-                            B2 += [0, 0, 0]
-                            B3 += [0, 0, 0]
-                  
-            A += [B1, B2, B3]
+                            if j in L: 
+                                B1 +=[0,0]
+                                B2 +=[0,0]
+                                B3 +=[0,0] 
 
-    for i in range(cmax(n,g-1)+1,cmax(n,g)+1):
-        if Vertices[i - 1][-2] == 0:
-            B1, B2, B3 = [], [], []
-            for j in range(1, v + 1):
-                if j == fl(i, g):
-                    w = K(g)*Eo[Edges.index((j, i))][1]
-                    B1 += [0, -w]
-                    B2 += [0, 0]
-                    B3 += [0, 0]
+                            elif j in R:
+                                B1 +=[0,0]
+                                B2 +=[0,0]
+                                B3 +=[0,0] 
 
-                    # B1 += [0, 0, -w, 0]
-                    # B2 += [0, 0, 0, 0]
-                    # B3 += [0, 0, 0, 0]
-                elif j == fr(i, g):
-                    w = K(g)*Eo[Edges.index((i, j))][1]
-                    B1 += [0, 0]
-                    B2 += [0, 0]
-                    B3 += [w, 0]
-
-                    # B1 += [0, 0, 0, 0]
-                    # B2 += [0, 0, 0, 0]
-                    # B3 += [w, 0, 0, 0]
-                else:
-                    if (j, i) in Edges:
-                        w = K(g)*Eo[Edges.index((j, i))][1]
-                        B1 += [0, 0, 0]
-                        B2 += [0, -w, 0]
-                        B3 += [0, 0, 0]
-                    else:
-                        if j == i:
-                            B1 += [0, -1, 1]
-                            B2 += [1, 0, -1]
-                            B3 += [-1, 1, 0]
-                        else:
-                            if j>cmax(n,g-1):
-                                if Vertices[j-1][-2]==0:
-                                   B1 += [0, 0, 0]
-                                   B2 += [0, 0, 0]
-                                   B3 += [0, 0, 0]
-                                else:
-                                    B1 += [0, 0]
-                                    B2 += [0, 0]
-                                    B3 += [0, 0]
-
-                                    # B1 += [0, 0, 0, 0]
-                                    # B2 += [0, 0, 0, 0]
-                                    # B3 += [0, 0, 0, 0]
                             else:
                                 B1 += [0, 0, 0]
                                 B2 += [0, 0, 0]
                                 B3 += [0, 0, 0]
-
+                  
             A += [B1, B2, B3]
 
-        else:
-            B1, B2 = [], [] #Is to be changed to triangular modification and put in periodic boundary condtition
+    for i in range(cmax(n,g-1)+1,v+1):
+        if Vertices[i - 1][-2] == 0:
+            if i in L:
+               B1,B2=[],[]
+               for j in range(1, v + 1):
+                    if j == fr(i, g):
+                        w = K(g)*Eo[Edges.index((i, j))][1]
+                        B1 += [0, 0]
+                        B2 += [w, 0]
+                    else:
+                        if (j, i) in Edges:
+                            w = K(g)*Eo[Edges.index((j, i))][1]
+                            B1 += [0, -w, 0]
+                            B2 += [0, 0, 0]
+                        else:
+                            if j == i:
+                                B1 += [0, -1]
+                                B2 += [1, 0]
+                            else:
+                                if j>cmax(n,g-1):
+                                    if Vertices[j-1][-2]==0 and j not in RL:
+                                        B1 += [0, 0, 0]
+                                        B2 += [0, 0, 0]
+                                    else:
+                                        B1 += [0, 0]
+                                        B2 += [0, 0]
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, 0, 0]
 
-            #B1,B2,B3,B4=[],[],[],[]
+               A += [B1, B2]
+
+
+
+            elif i in R:
+               B1,B2=[],[]
+               for j in range(1, v + 1):
+                    if j == fl(i, g):
+                        w = K(g)*Eo[Edges.index((j, i))][1]
+                        B1 += [0, -w]
+                        B2 += [0, 0]
+                    else:
+                        if (j, i) in Edges:
+                            w = K(g)*Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, -w, 0]
+                        else:
+                            if j == i:
+                                B1 += [0, -1]
+                                B2 += [1, 0]
+                            else:
+                                if j>cmax(n,g-1):
+                                    if Vertices[j-1][-2]==0 and j not in RL:
+                                        B1 += [0, 0, 0]
+                                        B2 += [0, 0, 0]
+                                    else:
+                                        B1 += [0, 0]
+                                        B2 += [0, 0]
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, 0, 0]
+
+               A += [B1, B2]
+
+            else:
+                B1, B2, B3 = [], [], []
+                for j in range(1, v + 1):
+                    if j == fl(i, g):
+                        w = K(g)*Eo[Edges.index((j, i))][1]
+                        B1 += [0, -w]
+                        B2 += [0, 0]
+                        B3 += [0, 0]
+
+                        # B1 += [0, 0, -w, 0]
+                        # B2 += [0, 0, 0, 0]
+                        # B3 += [0, 0, 0, 0]
+                    elif j == fr(i, g):
+                        w = K(g)*Eo[Edges.index((i, j))][1]
+                        B1 += [0, 0]
+                        B2 += [0, 0]
+                        B3 += [w, 0]
+
+                        # B1 += [0, 0, 0, 0]
+                        # B2 += [0, 0, 0, 0]
+                        # B3 += [w, 0, 0, 0]
+                    else:
+                        if (j, i) in Edges:
+                            w = K(g)*Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [0, -w, 0]
+                            B3 += [0, 0, 0]
+                        else:
+                            if j == i:
+                                B1 += [0, -1, 1]
+                                B2 += [1, 0, -1]
+                                B3 += [-1, 1, 0]
+                            else:
+                                if j>cmax(n,g-1):
+                                    if j in RL:
+                                        B1 +=[0,0]
+                                        B2 +=[0,0]
+                                        B3 +=[0,0]
+                                    if Vertices[j-1][-2]==0:
+                                        B1 += [0, 0, 0]
+                                        B2 += [0, 0, 0]
+                                        B3 += [0, 0, 0]
+                                    else:
+                                        B1 += [0, 0]
+                                        B2 += [0, 0]
+                                        B3 += [0, 0]
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, 0, 0]
+                                    B3 += [0, 0, 0]
+
+                A += [B1, B2, B3]
+
+        else:
+            B1, B2 = [], [] 
 
             for j in range(1, v + 1):
                 if Vertices[j-1][-2]==0:
-                    if j==fl(i, g):
-                        w= K(g)*Eo[Edges.index((j, i))][1]
-                        B1 += [0, 0, -w]
-                        B2 += [0, 0,  0]
+                    if j in L: 
+                       if j==fl(i,g):
+                            w= K(g)*Eo[Edges.index((j, i))][1]
+                            B1 += [0, -w]
+                            B2 += [0,  0]
+                       else: 
+                           B1 +=[0,0]
+                           B2 +=[0,0]
 
-                        # B1 += [0, 0, -w]
-                        # B2 += [0, 0,  0]
-                        # B3 += [0, 0, 0]
-                        # B4 += [0, 0, 0]
-                    elif j==fr(i, g):
-                        w= K(g)*Eo[Edges.index((i, j))][1]
-                        B1 += [0, 0, 0]
-                        B2 += [w, 0, 0]
+                    elif j in R:
+                       if j==fr(i,g):
+                            w= K(g)*Eo[Edges.index((i, j))][1]
+                            B1 += [0,  0]
+                            B2 += [w,  0]
+                       else: 
+                           B1 +=[0,0]
+                           B2 +=[0,0]
 
-                        # B1 += [0, 0, 0]
-                        # B2 += [0, 0,  0]
-                        # B3 += [w, 0, 0]
-                        # B4 += [0, 0, 0]
                     else:
-                        B1+=[0,0,0]
-                        B2+=[0,0,0]
+                        if j==fl(i, g):
+                            w= K(g)*Eo[Edges.index((j, i))][1]
+                            B1 += [0, 0, -w]
+                            B2 += [0, 0,  0]
 
-                        # B1+=[0,0,0]
-                        # B2+=[0,0,0]
-                        # B3+=[0,0,0]
-                        # B4+=[0,0,0]
+                        elif j==fr(i, g):
+                            w= K(g)*Eo[Edges.index((i, j))][1]
+                            B1 += [0, 0, 0]
+                            B2 += [w, 0, 0]
+                        else:
+                            B1+=[0,0,0]
+                            B2+=[0,0,0]
+
                 else:
                     if j==fl(i, g):
                         w= K(g)*Eo[Edges.index((j, i))][1]
                         B1 += [0, -w]
                         B2 += [0, 0]
 
-                        # B1+=[0,0,-w,0]
-                        # B2+=[0,0,0,0]
-                        # B3+=[0,0,0,0]
-                        # B4+=[0,0,0,0]
                     elif j==fr(i,g):
                         w= K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0,  0]
                         B2 += [w, 0]
 
-                        # B1+=[0,0,0,0]
-                        # B2+=[0,0,0,0]
-                        # B3+=[w,0,0,0]
-                        # B4+=[0,0,0,0]
                     else:
                         if j==i:
                             B1+=[0,-1]
                             B2+=[1,0]
 
-                            # B1+=[0,1,-1,0]
-                            # B2+=[-1,0,1,1]
-                            # B3+=[1,-1,0,0]
-                            # B4+=[0,-1,0,0]
                         else:
                             if j>cmax(n,g-1):
                                 B1 += [0,0]
                                 B2 += [0,0]
 
-                                # B1+=[0,0,0,0]
-                                # B2+=[0,0,0,0]
-                                # B3+=[0,0,0,0]
-                                # B4+=[0,0,0,0]
                             else:
                                 B1 += [0,0,0]
                                 B2 += [0,0,0]
 
-                                # B1 += [0,0,0]
-                                # B2 += [0,0,0]
-                                # B3 += [0,0,0]
-                                # B4 += [0,0,0]
-
             A +=[B1, B2]
-            #A += [B1, B2, B3, B4]
 
     return A
+
+E=A_ac(1,1,7,2)
+print(len(E))
