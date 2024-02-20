@@ -88,7 +88,7 @@ def s(n):
         return n/2+1
     
 def cmax_ac(n,g):
-    return cmax(n,g)-2*Layers(n,g-1)[0]
+    return cmax(n,g)-(n-5)*Layers(n,g-1)[0]
 
     
 #Construction of the (n,3) Hyperbolic graph with Pfaffian orientation
@@ -207,10 +207,6 @@ def Hyp(n, g):
                               E.append((c0,c))
                               Eo.append([(c0,c),1])
                               En.append(c)
-                              nv = v[:-1]  # Remove the last element of v
-                              nv.append(i)
-                              nv.append(c)
-                              new_vertices.append(nv)
                             if c<cmax(n,j):
                                 nv = v[:-1]  # Remove the last element of v
                                 nv.append(i)
@@ -252,7 +248,6 @@ def Hyp(n, g):
 # plt.show()
 
 #print(Hyp(7,2)[0])
-
 
 
 def A_ac(b,I,n,g): 
@@ -309,7 +304,7 @@ def A_ac(b,I,n,g):
                 return i+1
     
     RL=R+L
-    
+
 
 # #Modifying the graph with Fisher construction
 
@@ -335,9 +330,20 @@ def A_ac(b,I,n,g):
                         else:
                             if (i, j) in Edges:
                                 w=K(gen)*Eo[Edges.index((i, j))][1]
-                                B1 += [0, 0, 0]
-                                B2 += [0, w, 0]
-                                B3 += [0, 0, 0]
+                                if j in L:
+                                    B1 += [0, 0]
+                                    B2 += [w, 0]
+                                    B3 += [0, 0]
+
+                                elif j in R:
+                                    B1 += [0, 0]
+                                    B2 += [0, w]
+                                    B3 += [0, 0]
+
+                                else:
+                                    B1 += [0, 0, 0]
+                                    B2 += [0, w, 0]
+                                    B3 += [0, 0, 0]
 
                             else:
                                 if j == i:
@@ -384,7 +390,7 @@ def A_ac(b,I,n,g):
                 else:  # j is in the last layer
                     if Vertices[j - 1][-2]!= 0:
                         B1 += [0, 0]
-                        B2 += [0, 0] #Asymmetric boundary condition
+                        B2 += [0, 0] 
                         B3 += [0, 0]
 
                     else:
@@ -405,12 +411,7 @@ def A_ac(b,I,n,g):
                                 B2 += [0, w, 0]
                                 B3 += [0, 0, 0]
                         else:
-                            if j in L: 
-                                B1 +=[0,0]
-                                B2 +=[0,0]
-                                B3 +=[0,0] 
-
-                            elif j in R:
+                            if j in RL: 
                                 B1 +=[0,0]
                                 B2 +=[0,0]
                                 B3 +=[0,0] 
@@ -454,8 +455,6 @@ def A_ac(b,I,n,g):
 
                A += [B1, B2]
 
-
-
             elif i in R:
                B1,B2=[],[]
                for j in range(1, v + 1):
@@ -495,18 +494,12 @@ def A_ac(b,I,n,g):
                         B2 += [0, 0]
                         B3 += [0, 0]
 
-                        # B1 += [0, 0, -w, 0]
-                        # B2 += [0, 0, 0, 0]
-                        # B3 += [0, 0, 0, 0]
                     elif j == fr(i, g):
                         w = K(g)*Eo[Edges.index((i, j))][1]
                         B1 += [0, 0]
                         B2 += [0, 0]
                         B3 += [w, 0]
 
-                        # B1 += [0, 0, 0, 0]
-                        # B2 += [0, 0, 0, 0]
-                        # B3 += [w, 0, 0, 0]
                     else:
                         if (j, i) in Edges:
                             w = K(g)*Eo[Edges.index((j, i))][1]
@@ -524,7 +517,7 @@ def A_ac(b,I,n,g):
                                         B1 +=[0,0]
                                         B2 +=[0,0]
                                         B3 +=[0,0]
-                                    if Vertices[j-1][-2]==0:
+                                    elif Vertices[j-1][-2]==0:
                                         B1 += [0, 0, 0]
                                         B2 += [0, 0, 0]
                                         B3 += [0, 0, 0]
@@ -550,8 +543,8 @@ def A_ac(b,I,n,g):
                             B1 += [0, -w]
                             B2 += [0,  0]
                        else: 
-                           B1 +=[0,0]
-                           B2 +=[0,0]
+                            B1 +=[0,0]
+                            B2 +=[0,0]
 
                     elif j in R:
                        if j==fr(i,g):
@@ -559,8 +552,8 @@ def A_ac(b,I,n,g):
                             B1 += [0,  0]
                             B2 += [w,  0]
                        else: 
-                           B1 +=[0,0]
-                           B2 +=[0,0]
+                            B1 +=[0,0]
+                            B2 +=[0,0]
 
                     else:
                         if j==fl(i, g):
@@ -605,5 +598,48 @@ def A_ac(b,I,n,g):
 
     return A
 
-E=A_ac(1,1,7,2)
-print(len(E))
+n,g,I=7,4,1
+n1,g1,I1=7,2,1
+
+N=cmax(n,g)+Layers(n,g)[2]
+N1=cmax(n1,g1)+Layers(n1,g1)[2]
+
+B=np.linspace(0.01,5,100)
+E,Pf=[],[]
+#E1,Pf1=[],[]
+
+for b in B:
+    Pfaff=np.array(A_ac(b,I,n,g))
+    #Pfaff1=np.array(A_ac(b,I1,n1,g1))
+    e0=eig(Pfaff)[0]
+    #e01=eig(Pfaff1)[0]
+    e0c=np.imag(e0)
+    #e0c1=np.imag(e01)
+
+    s0=0
+    for e in e0c:
+        if e>=0:
+           s0 +=np.log(e)
+  
+    # s1=0
+    # for e1 in e0c1: 
+    #     if e1>=0:
+    #        s1 +=np.log(e1)
+
+    E.append(e0c)
+    #E1.append(e0c1)
+    Pf.append((s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2))*10**-2)
+    #Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
+
+plt.plot(B,E,'r+')
+#plt.plot(B,E1,'g+')
+#plt.plot(B,Pf,'g+')
+#plt.plot(B,Pf1,'g+')
+plt.plot(B,B*0,'b')
+plt.xlabel("Beta--->")
+plt.ylabel("Eigenspectrum--->")
+# plt.ylim([-10,10])
+#plt.legend()
+plt.show()
+
+
