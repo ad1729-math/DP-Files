@@ -551,165 +551,49 @@ def A(b, I ,n , g):
 
     return A
 
-# n,g,I=8,2,1
-# # n1,g1,I1=6,3,1
-# b=1
+n,g,I=8,2,1
+# n1,g1,I1=6,3,1
+b=1
 
-# N=cmax(n,g)+Layers(n,g)[2]
-# # N1=cmax(n1,g1)+Layers(n1,g1)[2]
+N=cmax(n,g)+Layers(n,g)[2]
+# N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-# B=np.linspace(0.4,4,100)
-# E,Pf=[],[]
-# E1,Pf1=[],[]
+B=np.linspace(0.4,4,100)
+E,Pf=[],[]
+E1,Pf1=[],[]
 
-# for b in B:
-#     Pfaff=np.array(A(b,I,n,g))
-#    # Pfaff1=np.array(Ah(b,I1,n1,g1))
-#     e0=eig(Pfaff)[0]
-#    # e01=eig(Pfaff1)[0]
-#     e0c=np.imag(e0)
-#     # e0c1=np.imag(e01)
+for b in B:
+    Pfaff=np.array(A(b,I,n,g))
+   # Pfaff1=np.array(Ah(b,I1,n1,g1))
+    e0=eig(Pfaff)[0]
+   # e01=eig(Pfaff1)[0]
+    e0c=np.imag(e0)
+    # e0c1=np.imag(e01)
 
-#     s0=0
-#     for e in e0c:
-#         if e>=0:
-#            s0 +=np.log(e)
+    s0=0
+    for e in e0c:
+        if e>=0:
+           s0 +=np.log(e)
   
-#     # s1=0
-#     # for e1 in e0c1: 
-#     #     if e1>=0:
-#     #        s1 +=np.log(e1)
+    # s1=0
+    # for e1 in e0c1: 
+    #     if e1>=0:
+    #        s1 +=np.log(e1)
 
-#     E.append(e0c)
-#    # E1.append(e0c1)
-#     Pf.append((s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)))
-#    # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
+    E.append(e0c)
+   # E1.append(e0c1)
+    Pf.append((s0+N*np.log(np.sinh(b*I))+cmax(n,g)*np.log(2)))
+   # Pf1.append(s1+N1*np.log(np.sinh(b*I1))+cmax(n1,g1)*np.log(2))
 
-# plt.plot(B,E,'g+')
-# #plt.plot(B,E1,'g+')
-# #plt.plot(B,Pf,'g+')
-# #plt.plot(B,Pf1,'r+')
-# plt.plot(B,B*0,'b')
-# plt.xlabel("Beta--->")
-# plt.ylabel("Eigenspectrum--->")
-# # plt.ylim([-10,10])
-# #plt.legend()
-# plt.show()
+plt.plot(B,E,'g+')
+#plt.plot(B,E1,'g+')
+#plt.plot(B,Pf,'g+')
+#plt.plot(B,Pf1,'r+')
+plt.plot(B,B*0,'b')
+plt.xlabel("Beta--->")
+plt.ylabel("Eigenspectrum--->")
+# plt.ylim([-10,10])
+#plt.legend()
+plt.show()
 
 
-n,g=8,3
-v=cmax(n,g)
-L=Hyp(n,g)
-Ver,Edges,Eo=L[0],L[1],L[2]
-A=[]
-
-Vertices=[]
-for j in range(0,g+1):
-    for vals in Ver[j]:
-        Vertices.append(vals)
-
-def fl(i,j):
-    if j==0:
-        if i==1:
-            return n
-        else: return i-1
-    else: 
-        if i==cmax(n,j-1)+1:
-            return cmax(n,j)
-        else:
-            return i-1
-
-def fr(i,j):
-    if j==0:
-        if i<n:
-            return i+1
-        else: 
-            return 1
-    else: 
-        if i==cmax(n,j):
-            return cmax(n,j-1)+1
-        else:
-            return i+1
-        
-def Num(n,g):
-    C1,C0=1,0
-    if g==0:
-        v=1
-    else: 
-        for i in range(g-1):
-            c,d=C1,C0
-            C1=(n-4)*c+1
-            C0=c
-        v=C1+C0
-    return (cmax(n,g-1)+1)+v+2
-        
-n0=Num(n,g)
-
-L_half, R_half=[n0],[n0+1]
-i0,i1=n0,n0+1
-for j in range(0,int((cmax(n,g)-cmax(n,g-1))/2)-1):
-    if Vertices[fr(i1,g)-1][-2]!=0:
-        R_half.append(fr(i1,g))
-    i1=fr(i1,g)
-
-    if Vertices[fl(i0,g)-1][-2]!=0:
-        L_half.append(fl(i0,g))
-    i0=fl(i0,g)
-
-print(R_half, L_half)
-
-i0,i1=L_half[0],R_half[0]
-Ed, Dir= [(i0,i1)],[1]
-
-for j in range(1, len(L_half)):
-
-    Ed.append([L_half[j],R_half[j]])
-    p1,q1=L_half[j],R_half[j]
-    p0,q0=L_half[j-1],R_half[j-1]
-    s1,s2=0,0
-
-    if p1==fl(p0,g):
-        if Eo[Edges.index((p1, p0))][1]==1:
-            s1+=1
-        
-        if Eo[Edges.index((q0, q1))][1]==1:
-            s2+=1
-
-    else: 
-        if Eo[Edges.index((fl(p0,g), p0))][1]==1:
-            s1+=1
-            if Eo[Edges.index((p1, fl(p0,g)))][1]==1:
-                s1+=1
-        elif Eo[Edges.index((p1, fl(p0,g)))][1]==-1 and Eo[Edges.index((p1, fl(p0,g)))][1]==1:
-                s1+=1
-        else: 
-            s1+=0 
-
-        if Eo[Edges.index((q0, fr(q0,g)))][1]==1:
-            s2+=1
-            if Eo[Edges.index((fr(p0,g),p1))][1]==1:
-                s2+=1
-        elif Eo[Edges.index((q0,fr(q0,g)))][1]==-1 and Eo[Edges.index((fl(q1,g),q1))][1]==1:
-                s2+=1
-        else: 
-            s2+=0 
-    
-    s=Dir[-1]
-    if (s1+s2+s)%2==0:
-        Dir.append(-1)
-    else: 
-        Dir.append(1)
-            
-    
-def Tor_dir(i,j):
-    
-    if i in L_half and j in R_half:
-        if L_half.index(i)==R_half.index(j):
-            return Dir[L_half.index(i)]
-
-    elif i in R_half and j in L_half: 
-        if R_half.index(i)==L_half.index(j):
-            return -Dir[R_half.index(i)]
-
-    else: 
-        return 0
