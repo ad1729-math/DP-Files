@@ -207,7 +207,7 @@ def A(b, I ,n , g):
 
     def K(a):
         return 1/np.tanh(b*I) #1/np.tanh(b*I*Metric(a))
-
+    
     v=cmax(n,g)
     L=Hyp(n,g)
     Ver,Edges,Eo=L[0],L[1],L[2]
@@ -242,7 +242,7 @@ def A(b, I ,n , g):
                 return i+1
             
     def Num(n,g):
-        C1,C0=4,0
+        C1,C0=(n-4),0
         if g==0:
             v=1
         else: 
@@ -271,25 +271,24 @@ def A(b, I ,n , g):
 
     c0=int(side_len/4)
 
-
     for i in range(0,c0):
         U1.append(L_half[c0-i-1])
-        D1.append(L_half[3*c0+i])
+        D1.append(L_half[int(Layers(n,g)[1]/2)-(c0-i)])
 
     for i in range(0,c0):
         U1.append(R_half[i])
         D1.append(R_half[side_len-i-1])
 
-    for i in range(c0,c0*3):
+    for i in range(c0,int(Layers(n,g)[1]/2-c0)):
         L1.append(L_half[i])
         R1.append(R_half[i])
+
 
     l1,r1,u1,d1=L1[0],R1[0],U1[0],D1[0]
     Ed1, Ed2, Dir1, Dir2= [(l1,r1)],[(u1,d1)],[1],[1]
 
     for j in range(1, len(L1)):
         Ed1.append((L1[j], R1[j]))
-        Ed2.append((U1[j], D1[j]))
         p1,q1=L1[j],R1[j]
         p0,q0=L1[j-1],R1[j-1]
 
@@ -327,10 +326,15 @@ def A(b, I ,n , g):
         else: 
             Dir1.append(1)
 
+    for j in range(1,len(U1)):
+
+        Ed2.append((U1[j], D1[j]))
+
         x1,y1=U1[j],D1[j]
         x0,y0=U1[j-1],D1[j-1]
         t1,t2=0,0
         
+    
         if x1==fr(x0,g):
             if Eo[Edges.index((x0, x1))][1]==1:
                 t1+=1
@@ -615,12 +619,11 @@ def A(b, I ,n , g):
 
 n,g,I=8,3,1
 # n1,g1,I1=6,3,1
-b=1
 
 N=cmax(n,g)+Layers(n,g)[2]
 # N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(0.1,4,100)
+B=np.linspace(0.1,3,50)
 E,Pf=[],[]
 E1,Pf1=[],[]
 
@@ -657,4 +660,5 @@ plt.ylabel("Eigenspectrum--->")
 # plt.ylim([-10,10])
 #plt.legend()
 plt.show()
+
 
