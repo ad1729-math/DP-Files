@@ -242,16 +242,16 @@ def A(b, I ,n , g):
                 return i+1
             
     def Num(n,g):
-        C1,C0=1,0
+        C1,C0=4,0
         if g==0:
             v=1
         else: 
             for i in range(g-1):
                 c,d=C1,C0
-                C1=(n-4)*c+1
-                C0=c
+                C1=(n-4)*(c-1)-d
+                C0=c-2
             v=C1+C0
-        return (cmax(n,g-1)+1)+v+1
+        return cmax(n,g-1)+int((v+3)/2)
             
     n0=Num(n,g)
 
@@ -388,6 +388,7 @@ def A(b, I ,n , g):
 
         else:
             return 0
+
 
     
           
@@ -612,7 +613,7 @@ def A(b, I ,n , g):
 
     return A
 
-n,g,I=8,2,1
+n,g,I=8,3,1
 # n1,g1,I1=6,3,1
 b=1
 
@@ -656,3 +657,4 @@ plt.ylabel("Eigenspectrum--->")
 # plt.ylim([-10,10])
 #plt.legend()
 plt.show()
+
