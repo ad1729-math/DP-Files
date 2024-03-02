@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 from numpy.linalg import eig, det
 
 def Metric(gen):
+
     # if gen==g:
     #     return 1
     # else: 
     #     return 10**-4
 
     return 1/(1-np.tanh(gen/2)**2) #Scaling the interaction strength with metric
-#Total number points upto generation g
+    #Total number points upto generation g
 
 
 def Layers(n,g):
@@ -207,7 +208,7 @@ def A(b, I ,n , g):
 
     def K(a):
         return 1/np.tanh(b*I) #1/np.tanh(b*I*Metric(a))
-
+    
     v=cmax(n,g)
     L=Hyp(n,g)
     Ver,Edges,Eo=L[0],L[1],L[2]
@@ -279,6 +280,7 @@ def A(b, I ,n , g):
     if Eo[Edges.index((j1, j0))][1]==1:  Dir2.append(-1)
     else: Dir2.append(1)
 
+    Su=[]
 
     for j in range(1, int(len(L_half)/2)):
 
@@ -294,12 +296,13 @@ def A(b, I ,n , g):
             if Eo[Edges.index((q0, q1))][1]==-1:
                 s2+=1
 
-        else: 
+        elif p1==fl(fl(p0,g),g): 
+
             if Eo[Edges.index((fl(p0,g), p0))][1]==-1:
                 s1+=1
                 if Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
                     s1+=1
-            elif Eo[Edges.index((p1, fl(p0,g)))][1]==1 and Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
+            elif Eo[Edges.index((fl(p0,g),p0))][1]==1 and Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
                     s1+=1
             else: 
                 s1+=0 
@@ -308,16 +311,23 @@ def A(b, I ,n , g):
                 s2+=1
                 if Eo[Edges.index((fr(q0,g),q1))][1]==-1:
                     s2+=1
-            elif Eo[Edges.index((q0,fr(q0,g)))][1]==1 and Eo[Edges.index((fl(q1,g),q1))][1]==-1:
+            elif Eo[Edges.index((q0, fr(q0,g)))][1]==1 and Eo[Edges.index((fr(q0,g), q1))][1]==-1:
                     s2+=1
             else: 
                 s2+=0 
+        Su.append((s1,s2))
         
         s=Dir1[-1]
-        if (s1+s2+s)%2==0:
-            Dir1.append(1)
-        else: 
-            Dir1.append(-1)
+        if s==1:
+            if (s1+s2)%2==0:
+                Dir1.append(1)
+            else: 
+                Dir1.append(-1)
+        else:
+            if (s1+s2)%2==0:
+                Dir1.append(-1)
+            else: 
+                Dir1.append(1)
 
     for k in range(1, len(L_half)-int(len(L_half)/2)):
 
@@ -336,29 +346,37 @@ def A(b, I ,n , g):
                 s2+=1
 
         elif p1==fl(fl(p0,g),g): 
+
             if Eo[Edges.index((fl(p0,g), p0))][1]==-1:
                 s1+=1
                 if Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
                     s1+=1
-            elif Eo[Edges.index((p1, fl(p0,g)))][1]==1 and Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
+            elif Eo[Edges.index((fl(p0,g), p0))][1]==1 and Eo[Edges.index((p1, fl(p0,g)))][1]==-1:
                     s1+=1
             else: 
                 s1+=0 
 
             if Eo[Edges.index((q0, fr(q0,g)))][1]==-1:
                 s2+=1
-                if Eo[Edges.index((fr(p0,g),p1))][1]==-1:
+                if Eo[Edges.index((fr(q0,g), q1))][1]==-1:
                     s2+=1
-            elif Eo[Edges.index((q0,fr(q0,g)))][1]==1 and Eo[Edges.index((fl(q1,g),q1))][1]==-1:
+            elif Eo[Edges.index((q0, fr(q0,g)))][1]==1 and Eo[Edges.index((fl(q1,g),q1))][1]==-1:
                     s2+=1
             else: 
                 s2+=0 
         
         s=Dir2[-1]
-        if (s1+s2+s)%2==0:
-            Dir2.append(1)
-        else: 
-            Dir2.append(-1)
+        if s==1:
+            if (s1+s2)%2==0:
+                Dir2.append(-1)
+            else: 
+                Dir2.append(1)
+        else:
+            if (s1+s2)%2==0:
+                Dir2.append(1)
+            else: 
+                Dir2.append(-1)
+
                 
         
     def Tor_dir(i,j):
@@ -387,7 +405,6 @@ def A(b, I ,n , g):
             
         else:
             return 0
-    
           
 # #Modifying the graph with Fisher construction
 
@@ -615,14 +632,14 @@ def A(b, I ,n , g):
 
     return A
 
-n,g,I=6,6,1
+n,g,I=8,2,1
 # n1,g1,I1=6,3,1
 b=1
 
 N=cmax(n,g)+Layers(n,g)[2]
 # N1=cmax(n1,g1)+Layers(n1,g1)[2]
 
-B=np.linspace(0.5,3,100)
+B=np.linspace(0.2,3,100)
 E,Pf=[],[]
 E1,Pf1=[],[]
 
@@ -659,4 +676,6 @@ plt.ylabel("Eigenspectrum--->")
 # plt.ylim([-10,10])
 #plt.legend()
 plt.show()
+
+
 
