@@ -42,12 +42,10 @@ def Adj(i,j):
 
 
 
-
-
 Worm_size=[]
 
-It=100
-En=10000
+It=5
+En=1000
 
 I=list(np.arange(0,It,1))
 
@@ -60,7 +58,7 @@ for ensemble in range(En):
            Dimer.append([(2*i,j), (2*i+1,j)])
            Dimer.append([(2*i+1,j),(2*i,j)])
 
-    i0,j0=random.randint(0,m), random.randint(0,n)
+    i0,j0=int(m/2), int(n/2) #random.randint(0,m), random.randint(0,n)
     a0,b0=i0,j0
 
     for l in Adj(i0,j0):
@@ -115,7 +113,7 @@ for i in range(It):
     for j in Worm_size:
         if i==j:
             c+=1
-    Dist.append(c)
+    Dist.append(c/En)
 
 
 plt.plot(I, Dist, 'bo')
