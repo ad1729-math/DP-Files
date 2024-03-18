@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import cmath as cm 
 from numpy.linalg import eig, det
 
-h0=10**-2
+h0=10**-3
 
 def Z(b,J,h,m,n): 
     a=2**(-1/4)
-    d,g,t,e=np.exp(b*J),np.exp(-b*J/2),a*np.exp(-b*h),np.sqrt(a)*np.exp(b*h/2)
+    d,g,t,e=np.exp(b*J),np.exp(-b*J/2),a*np.exp(-b*h/4),np.sqrt(a)*np.exp(b*h/8)
 
     def A(r,s): 
         j=complex(0,1)
@@ -22,20 +22,23 @@ def Z(b,J,h,m,n):
              
         return A
 
-    s=0
+    s0=0
     for r in range(m):
         for s in range(n):
            m0=abs(det(np.array(A(r,s))))
-           s+=1/2*np.log(m0)
+           s0+=1/2*np.log(m0)
 
-    return s
+    return s0
 
-B=np.linspace(0.1,6,100)
-Mag=[]
+B=np.linspace(0.1,3,100)
+Mag,Mag1=[],[]
 for b in B:
-   m=(Z(b,1,h0,200,200)-Z(b,1,0,200,200))/h0
-   Mag.append(m/4)
+   m=(Z(b,1,h0,100,100)-Z(b,1,0,100,100))/h0
+   m1=(Z(b,1,h0,200,200)-Z(b,1,0,200,200))/h0
+   Mag.append(m/10**4)
+   Mag1.append(m1/4/10**4)
 
 plt.plot(B,Mag,'r+')
+plt.plot(B,Mag1,'b+')
 plt.show()
 
