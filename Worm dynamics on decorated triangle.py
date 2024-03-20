@@ -6,6 +6,7 @@ from matplotlib.backend_bases import MouseEvent
 import matplotlib.pyplot as plt
 import netgraph 
 from pyvis.network import Network
+from numpy import random
 
 m0,n0=2,3
 m,n=2*m0+1,2*n0
@@ -175,12 +176,11 @@ def Adj(c):
 
     return Ad
 
-Dim0=[]
 
 for y in range(0,m+1):
 
     if y==0:
-      for x in range(1,n0+1):
+        for x in range(1,n0+1):
             c1,c2,c3=Enum(x,y,1),Enum(x,y,2),Enum(x,y,3)
             
             E1.remove((c1,c2))
@@ -211,11 +211,75 @@ for y in range(0,m+1):
             E1.remove((c2,c1))
             E1.remove((c1,c3))
 
+
+
+It=100
+en=100
+
+Worm_size=[]
+for iter in range(en):
+
+    Dimer=[]
+
+    for e in E1:
+        Dimer.append(list(e))
+    
+    x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
+    c0=Enum(x,y,k)
+
+    for l in Adj(c0):
+        if [l,c0] in Dimer:
+            l0=l
+
+    c1=l0
+
+    for it in range(It):
+
+        a,b=c0,c1
+
+        Dimer.remove([b,a])
+        Dimer.remove([a,b])
+
+        Neig=Adj(c0)
+        Neig.remove(a)
+        v=len(Neig)
         
-G=nx.Graph(E1)
-G.add_edges_from(E1)
+        if v>0:
+
+            t=random.randint(0,v)
+            s0=Neig[t]
+
+            Dimer.append([c1,s0])
+            Dimer.append([s0,c1])
+
+            x=s0
+
+            Neig2=Adj(x)
+            
+            for s1 in Neig2:
+                if [s1,s0] in Dimer: 
+                  S1=list(s1)
+                  x1=S1
+
+            c0=x
+            c1=x1
+
+            if (c0)==(c1):
+                sz=it+1
+                break
+            else:
+                sz=It
+        
+        else:
+            sz=it
+            break
+        
+    Worm_size.append(sz)
+
+
+G=nx.Graph(Dimer)
+G.add_edges_from(Dimer)
 
 nx.draw(G,  with_labels=True)
 plt.show() 
    
-print(E1)
