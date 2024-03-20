@@ -8,7 +8,7 @@ import netgraph
 from pyvis.network import Network
 from numpy import random
 
-m0,n0=2,2
+m0,n0=1,2
 m,n=2*m0+1,2*n0
 
 A=[]
@@ -131,7 +131,7 @@ for y in range(m+1):
                 A.append([[x,y,3],[x+1,y,1]])
   
             elif x==1:
-               A.append([[x,y,1],[0,1,3]])
+               A.append([[x,y,1],[0,y-1,1]])
                A.append([[x,y,2],[2*x-1,y-1,2]])
                A.append([[x,y,3],[x+1,y,1]])
 
@@ -192,6 +192,7 @@ for y in range(0,m+1):
             E1.remove((c3,c2))
             E1.remove((c2,c1))
             E1.remove((c1,c3))
+
     elif y==m:
         for x in range(1,n0+1):
             c1,c2,c3=Enum(x,y,1),Enum(x,y,2),Enum(x,y,3)
@@ -214,8 +215,6 @@ for y in range(0,m+1):
             E1.remove((c2,c1))
             E1.remove((c1,c3))
 
-print(E1)
-
 
 #Worm size 
             
@@ -232,7 +231,7 @@ for e in E1:
     Dimer.append(list(e))
 
 x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
-c0=Enum(x,y,k)
+c0=2 #Enum(x,y,k)
 
 for l in Adj(c0):
     if [l,c0] in Dimer:
@@ -282,6 +281,8 @@ for it in range(It):
         sz=it
         break
         
+print(sz)
+
     # Worm_size.append(sz)
 
 # I=list(np.arange(0,It+1,1))
@@ -300,6 +301,7 @@ for it in range(It):
 # print(Dist)
     
 G=nx.Graph()
+
 
 Dim=[]
 for l in Dimer:
