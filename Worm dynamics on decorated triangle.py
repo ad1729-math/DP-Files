@@ -8,7 +8,7 @@ import netgraph
 from pyvis.network import Network
 from numpy import random
 
-m0,n0=2,3
+m0,n0=2,2
 m,n=2*m0+1,2*n0
 
 A=[]
@@ -212,74 +212,96 @@ for y in range(0,m+1):
             E1.remove((c1,c3))
 
 
-
+#Worm size 
+            
 It=100
 en=100
 
 Worm_size=[]
-for iter in range(en):
 
-    Dimer=[]
+# for iter in range(en):
 
-    for e in E1:
-        Dimer.append(list(e))
+Dimer=[]
+
+for e in E1:
+    Dimer.append(list(e))
+
+x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
+c0=Enum(x,y,k)
+
+for l in Adj(c0):
+    if [l,c0] in Dimer:
+        l0=l
+
+c1=l0
+
+
+for it in range(It):
+
+    a,b=c0,c1
+
+    Dimer.remove([b,a])
+    Dimer.remove([a,b])
+
+    Neig=Adj(c1)
+    Neig.remove(a)
+    v=len(Neig)
     
-    x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
-    c0=Enum(x,y,k)
+    if v>0:
 
-    for l in Adj(c0):
-        if [l,c0] in Dimer:
-            l0=l
+        t=random.randint(0,v)
+        s0=Neig[t]
 
-    c1=l0
+        Dimer.append([c1,s0])
+        Dimer.append([s0,c1])
 
-    for it in range(It):
+        x=s0
 
-        a,b=c0,c1
-
-        Dimer.remove([b,a])
-        Dimer.remove([a,b])
-
-        Neig=Adj(c0)
-        Neig.remove(a)
-        v=len(Neig)
+        Neig2=Adj(x)
         
-        if v>0:
+        for s1 in Neig2:
+            if [s1,s0] in Dimer: 
+                S1=s1
+                x1=S1
 
-            t=random.randint(0,v)
-            s0=Neig[t]
+        c0=x
+        c1=x1
 
-            Dimer.append([c1,s0])
-            Dimer.append([s0,c1])
-
-            x=s0
-
-            Neig2=Adj(x)
-            
-            for s1 in Neig2:
-                if [s1,s0] in Dimer: 
-                  S1=list(s1)
-                  x1=S1
-
-            c0=x
-            c1=x1
-
-            if (c0)==(c1):
-                sz=it+1
-                break
-            else:
-                sz=It
-        
-        else:
-            sz=it
+        if (c0)==(c1):
+            sz=it+1
             break
+        else:
+            sz=It
+    
+    else:
+        sz=it
+        break
         
-    Worm_size.append(sz)
+    # Worm_size.append(sz)
 
+# I=list(np.arange(0,It+1,1))
 
-G=nx.Graph(Dimer)
-G.add_edges_from(Dimer)
+# Dist=[]
 
-nx.draw(G,  with_labels=True)
-plt.show() 
-   
+# for i in range(It+1):
+#     c=0
+#     for j in Worm_size:
+#         if i==j:
+#             c+=1
+#     Dist.append(c/en)
+
+# plt.plot(I, Dist, 'bo')
+# plt.show()
+# print(Dist)
+    
+G=nx.Graph()
+
+Dim=[]
+for l in Dimer:
+    Dim.append((l[0],l[1]))
+
+G.add_edges_from(Dim)
+
+nx.draw(G, with_labels=True, node_color='skyblue', node_size=100, font_size=12, font_weight='bold')
+
+plt.show()
