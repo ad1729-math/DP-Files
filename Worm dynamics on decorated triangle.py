@@ -1,6 +1,11 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
-import networkx as nx 
+import networkx as nx
+from matplotlib.widgets import Button
+from matplotlib.backend_bases import MouseEvent
+import matplotlib.pyplot as plt
+import netgraph 
+from pyvis.network import Network
 
 m0,n0=2,3
 m,n=2*m0+1,2*n0
@@ -12,6 +17,10 @@ for y in range(m+1):
             A.append([[x,y,1],[x,y,2]])
             A.append([[x,y,2],[x,y,3]])
             A.append([[x,y,3],[x,y,1]])
+
+            A.append([[x,y,2],[x,y,1]])
+            A.append([[x,y,3],[x,y,2]])
+            A.append([[x,y,1],[x,y,3]])
 
             if 1<=x<=n-1:
                 if (x+y)%2==0:
@@ -62,10 +71,10 @@ for y in range(m+1):
                 if y==1:
                     A.append([[x,y,1],[x,y+1,3]])
                     A.append([[x,y,2],[x-1,y,3]])
-                    A.append([[x,y,3],[n0-1,y-1,3]])
+                    A.append([[x,y,3],[n0,y-1,3]])
 
                 elif y==m-1:
-                    A.append([[x,y,1],[n0-1,y+1,3]])
+                    A.append([[x,y,1],[n0,y+1,3]])
                     A.append([[x,y,2],[x-1,y,3]])
                     A.append([[x,y,3],[x,y-1,1]])
 
@@ -81,7 +90,12 @@ for y in range(m+1):
            A.append([[x,y,1],[x,y,2]])
            A.append([[x,y,2],[x,y,3]])
            A.append([[x,y,3],[x,y,1]])
-           
+
+
+           A.append([[x,y,2],[x,y,1]])
+           A.append([[x,y,3],[x,y,2]])
+           A.append([[x,y,1],[x,y,3]])
+            
            if 1<x<n0:
                 A.append([[x,y,1],[x-1,y,3]])
                 A.append([[x,y,2],[2*x-1,y+1,2]])
@@ -104,6 +118,11 @@ for y in range(m+1):
             A.append([[x,y,1],[x,y,2]])
             A.append([[x,y,2],[x,y,3]])
             A.append([[x,y,3],[x,y,1]])
+
+
+            A.append([[x,y,2],[x,y,1]])
+            A.append([[x,y,3],[x,y,2]])
+            A.append([[x,y,1],[x,y,3]])
 
             if 1<x<n0:
                 A.append([[x,y,1],[x-1,y,3]])
@@ -142,8 +161,61 @@ for ed in A:
     E.append((c1,c2))
 
 
-G=nx.Graph(E)
-G.add_edges_from(E)
-nx.draw(G, with_labels=True)
-plt.show()
-    
+E_list=[]
+for e in E:
+    E_list.append(list(e))
+
+E1=E #Duplicating
+
+def Adj(c):
+    Ad=[]
+    for e in E_list:
+        if c==e[0]: 
+           Ad.append(e[1])
+
+    return Ad
+
+Dim0=[]
+
+for y in range(0,m+1):
+
+    if y==0:
+      for x in range(1,n0+1):
+            c1,c2,c3=Enum(x,y,1),Enum(x,y,2),Enum(x,y,3)
+            
+            E1.remove((c1,c2))
+            E1.remove((c2,c3))
+            E1.remove((c3,c1))
+            E1.remove((c3,c2))
+            E1.remove((c2,c1))
+            E1.remove((c1,c3))
+    elif y==m:
+        for x in range(1,n0+1):
+            c1,c2,c3=Enum(x,y,1),Enum(x,y,2),Enum(x,y,3)
+
+            E1.remove((c1,c2))
+            E1.remove((c2,c3))
+            E1.remove((c3,c1))
+            E1.remove((c3,c2))
+            E1.remove((c2,c1))
+            E1.remove((c1,c3))
+                
+    else:
+        for x in range(0,n+1):
+            c1,c2,c3=Enum(x,y,1),Enum(x,y,2),Enum(x,y,3)
+            
+            E1.remove((c1,c2))
+            E1.remove((c2,c3))
+            E1.remove((c3,c1))
+            E1.remove((c3,c2))
+            E1.remove((c2,c1))
+            E1.remove((c1,c3))
+
+        
+G=nx.Graph(E1)
+G.add_edges_from(E1)
+
+nx.draw(G,  with_labels=True)
+plt.show() 
+   
+print(E1)
