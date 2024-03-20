@@ -166,7 +166,10 @@ E_list=[]
 for e in E:
     E_list.append(list(e))
 
-E1=E #Duplicating
+E1=[] #Duplicating
+
+for e in E:
+    E1.append(e)
 
 def Adj(c):
     Ad=[]
@@ -210,6 +213,8 @@ for y in range(0,m+1):
             E1.remove((c3,c2))
             E1.remove((c2,c1))
             E1.remove((c1,c3))
+
+print(E1)
 
 
 #Worm size 
@@ -300,8 +305,9 @@ Dim=[]
 for l in Dimer:
     Dim.append((l[0],l[1]))
 
-G.add_edges_from(Dim)
+G.add_edges_from(E1)
 
 nx.draw(G, with_labels=True, node_color='skyblue', node_size=100, font_size=12, font_weight='bold')
 
 plt.show()
+    
