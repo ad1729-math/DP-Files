@@ -8,7 +8,7 @@ import netgraph
 from pyvis.network import Network
 from numpy import random
 
-m0,n0=2,3
+m0,n0=10,10
 m,n=2*m0+1,2*n0
 
 A=[]
@@ -243,19 +243,21 @@ for y in range(0,m+1):
             
 #Put weights to the dimers
             
-def W(c1,c2,J,b0):
+def W(c1,c2,b0,J):
     a,b=Rev_Enum(c1),Rev_Enum(c2)
 
-    if a[0]==b[0] and a[1]==b[1]:
-        return np.exp(-b0*J)
+    if c2 in Adj(c1):
 
-    elif c2 in Adj(c1):
-        return np.exp(b0*J)
+        if a[0]==b[0] and a[1]==b[1]: #For spin glass need a change here
+          return np.exp(-b0*J)
+        
+        else:
+          return np.exp(b0*J)
     
     else: 
         return 0
 
-b0,J=0.43,1
+b0,J=1,1
 
 It=500
 en=1000
@@ -357,7 +359,7 @@ for i in range(It+1):
             c+=1
     Dist.append(c/en)
 
-plt.plot(I, Dist, 'b+')
+plt.plot(I, Dist, 'r+')
 plt.show()
 
     
