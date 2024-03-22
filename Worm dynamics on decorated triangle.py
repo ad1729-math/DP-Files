@@ -8,7 +8,7 @@ import netgraph
 from pyvis.network import Network
 from numpy import random
 
-m0,n0=2,3
+m0,n0=4,4
 m,n=2*m0+1,2*n0
 
 A=[]
@@ -305,11 +305,11 @@ def JI(c1,c2):
 
      #return J0 #Ferromagnetic 
 
-     return -J0 #Anti-ferromagnetic
+     #return -J0 #Anti-ferromagnetic
 
-    # for In in Interactions: #Spin-glass (binary)
-    #     if c1==In[0] and c2==In[1]:
-    #        return In[2]
+    for In in Interactions: #Spin-glass (binary)
+        if c1==In[0] and c2==In[1]:
+           return In[2]
             
 def W(c1,c2,b0):
     a,b=Rev_Enum(c1),Rev_Enum(c2)
@@ -337,8 +337,8 @@ def W(c1,c2,b0):
         return 0
 
 
-It=100
-en=500
+It=2000
+en=2000
 
 def Dist(b0):
 
@@ -437,17 +437,21 @@ def Dist(b0):
                 c+=1
         Dist.append(c/en)
 
-    return Dist[-1]
+    return Dist
 
-# I=list(np.arange(0,It+1,1))
-B=np.linspace(0,7,40)
-Dist0=[]
-for b in B:
-    Dist0.append(Dist(b))
+I=list(np.arange(0,It+1,1))
 
-plt.plot(B,Dist0,'r')
-# plt.plot(I, Dist(0), 'r+')
-# plt.plot(I, Dist(3), 'b+')
+# B=np.linspace(0,7,40)
+# Dist0=[]
+# for b in B:
+#     Dist0.append(Dist(b))
+
+# plt.plot(B,Dist0,'r')
+plt.plot(I, Dist(0), 'r+', label='b=0')
+plt.plot(I, Dist(3), 'b+', label='b=1')
+plt.xlabel("$l$")
+plt.ylabel('$P(l)$')
+plt.legend()
 plt.show()
 
     

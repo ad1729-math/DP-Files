@@ -14,7 +14,7 @@ def Zl(b,J,h):
 
     def A(x,y): 
         j=complex(0,1)
-        # w1,w2=np.exp(2*j*np.pi*r/m),np.exp(2*j*np.pi*s/n)
+       # w1,w2=np.exp(2*j*np.pi*r/m),np.exp(2*j*np.pi*s/n)
         w1,w2=np.exp(2*np.pi*j*x),np.exp(2*np.pi*j*y)
         A0=[[0,-g,g,0,0, 0,-d/w1,0,0,0, 0,0,0,0,0, 0,0,0,0,0],[g,0,-1,0,0, 0,0,0,0,0, 0,0,0,0,0, 0,0,0,0,-e],[-g,1,0,0,0, 0,0,0,0,0, 0,0,e,0,0, 0,0,0,0,0],
         [0,0,0,0,-g, g,0,0,0,d/w2, 0,0,0,0,0, 0,0,0,0,0],[0,0,0,g,0, -1,0,0,0,0, 0,0,0,-e,0, 0,0,0,0,0],[0,0,0,-g,1, 0,0,0,0,0, 0,0,0,0,-e, 0,0,0,0,0 ],
@@ -31,7 +31,7 @@ def Zl(b,J,h):
             if e1>=0:
                 E.append(e1)
 
-        return np.sort(E)[0] #0.5*np.log(abs(det(np.array(A0))))
+        return np.sort(E)[0]  #0.5*np.log(abs(det(np.array(A0)))) #E0 #np.sort(E)[0] 
 
     # s0=0
     # for r in range(m):
@@ -47,10 +47,17 @@ def Zl(b,J,h):
     # s0=dblquad(A, x_lower, x_upper, y_lower, y_upper)[0]
 
     s0=A(x0,y0)
+    # E=[]
+    # for r in range(m):
+    #     for s in range(n):
+    #         for e in A(r,s):
+    #             E.append(e)
 
-    return s0
+    return s0 #E
 
-B=np.linspace(0.1,1,300)
+a=np.log(1+np.sqrt(2))/2
+
+B=np.linspace(a-10**-2,a+10**-2,1000)
 Mag,Mag1=[],[]
 for b in B:
 #    m=(Zl(b,1,h0,100,100)-Zl(b,1,0,100,100))/h0
@@ -59,11 +66,13 @@ for b in B:
    Mag.append(m)
 #    Mag1.append(m1)
 
-a=np.log(1+np.sqrt(2))/2
+# E=[]
+# for b in B:
+#     E.append(Zl(b,1,2,30,30))
 
-plt.plot(B,Mag,'r')
-# plt.plot(B,Mag1,'b')
-#plt.axvline(x=a, color='r', linestyle='--')
+# plt.plot(B,E,'r+')
+plt.plot(B,Mag,'b')
+plt.axhline(y=0, color='b', linestyle='--')
 plt.xlabel("$1/T$ --->")
 plt.ylabel("Magnetization --->")
 # plt.plot(B,E,'r+')
