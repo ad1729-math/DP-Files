@@ -8,7 +8,7 @@ import netgraph
 from pyvis.network import Network
 from numpy import random
 
-m0,n0=10,10
+m0,n0=2,3
 m,n=2*m0+1,2*n0
 
 A=[]
@@ -166,10 +166,10 @@ def Rev_Enum(c):
            return c0,0
         
         elif c0>(m-1)*(n+1)+n0: 
-           return c0-n0-(n-1)*(n+1)+n0 , m
+           return c0-n0-(m-1)*(n+1) , m
         
         else: 
-            y=int((c0-n0)/(n+1))+1
+            y=int((c0-n0-1)/(n+1))+1
             x=c0-n0-(y-1)*(n+1)-1
 
             return x,y
@@ -238,138 +238,215 @@ for y in range(0,m+1):
             E1.remove((c2,c1))
             E1.remove((c1,c3))
 
+E0=[]
+for e in E:
+    E0.append(e)
+
+Ec=[]
+for e in E0:
+    if e not in E1:
+       Ec.append(e)
 
 #Worm size 
-            
+
+J0=1          
 #Put weights to the dimers
+Interactions=[]
+for e in E1:
+    e1=list(e)
+    c1,c2=e1[0],e1[1]
+    a,b=Rev_Enum(c1),Rev_Enum(c2)
+
+    if 0<a[1]<m:
+
+      if 0<b[1]<m:
+
+        if a[0]==0 or a[0]==n-1:
+          
+          if b[0]!=0 or b[0]!=n-1:
+            Interactions.append([c1,c2,0])
+          else:
+            j=J0*random.choice([1,-1])
+            Interactions.append([c1,c2,j])
+
+        else:
+            j=J0*random.choice([1,-1])
+            Interactions.append([c1,c2,j])
             
-def W(c1,c2,b0,J):
+
+      else:
+          if b[0]==1 or b[0]==n0:
+            Interactions.append([c1,c2,0])      
+          else:      
+            j=J0*random.choice([1,-1])
+            Interactions.append([c1,c2,j]) 
+          
+    elif a[1]==0:
+        if b[1]==1:
+            if b[0]==0 or b[0]==n:
+               Interactions.append([c1,c2,0])
+            else:
+               j=J0*random.choice([1,-1])
+               Interactions.append([c1,c2,j])   
+        else:
+            Interactions.append([c1,c2,0])
+
+    else: 
+        if b[1]==m-1:
+            if b[0]==0 or b[0]==n:
+               Interactions.append([c1,c2,0])
+            else:
+               j=J0*random.choice([1,-1])
+               Interactions.append([c1,c2,j])   
+        else:
+            Interactions.append([c1,c2,0])
+
+def JI(c1,c2):
+    for In in Interactions:
+        if c1==In[0] and c2==In[1]:
+           return In[2]
+            
+def W(c1,c2,b0):
     a,b=Rev_Enum(c1),Rev_Enum(c2)
 
     if c2 in Adj(c1):
 
         if a[0]==b[0] and a[1]==b[1]: #For spin glass need a change here
-          return np.exp(-b0*J)
+           A1,A2=Adj(c1),Adj(c2)
+
+           for cm in A1:
+               if cm in A2:
+                  A1.remove(cm)
+                  A1.remove(c2)
+
+                  A2.remove(cm)
+                  A2.remove(c1)
+           
+           v=np.exp(-0.5*b0*(JI(c1, A1[0])+JI(c2, A2[0])))
         
+           return v
         else:
-          return np.exp(b0*J)
+          return np.exp(b0*JI(c1,c2))
     
     else: 
         return 0
 
-b0,J=1,1
-
 It=500
 en=1000
 
-Worm_size=[]
+def Dist(b0):
 
-for e in range(en):
+    Worm_size=[]
 
-    Dimer=[]
+    for e in range(en):
 
-    for e in E1:
-     Dimer.append(list(e))
+        Dimer=[]
 
-    x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
-    c0=2 #Enum(x,y,k)
+        for e in E1:
+         Dimer.append(list(e))
 
-    for l in Adj(c0):
-        if [l,c0] in Dimer:
-            l0=l
+        x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
+        c0=Enum(x,y,k)
 
-    c1=l0
+        for l in Adj(c0):
+            if [l,c0] in Dimer:
+                l0=l
 
-    a,b=c0,c1
+        c1=l0
 
-    for it in range(It):
+        a,b=c0,c1
 
-        Dimer.remove([b,a])
-        Dimer.remove([a,b])
+        for it in range(It):
 
-        Neig=Adj(b)
-        Neig.remove(a)
-        v=len(Neig)
-        
-        if v>0:
+            Dimer.remove([b,a])
+            Dimer.remove([a,b])
+
+            Neig=Adj(b)
+            Neig.remove(a)
+            v=len(Neig)
             
-            Weight,We=[],[]
-            for s in Neig:
-                Weight.append([W(s,b,b0,J),s])
-                We.append(W(s,b,b0,J))
-            
-            Norm=np.sum(We)
+            if v>0:
+                
+                Weight,We=[],[]
+                for s in Neig:
+                    Weight.append([W(s,b,b0),s])
+                    We.append(W(s,b,b0))
+                
+                Norm=np.sum(We)
 
-            P=[]
-            for w in We:
-                P.append(w/Norm)
+                P=[]
+                for w in We:
+                    P.append(w/Norm)
 
 
-            P1=[0]
-            sum=0
-            for vals in P:
-                sum+=vals
-                P1.append(sum)
-            
-            ra=random.random()
+                P1=[0]
+                sum=0
+                for vals in P:
+                    sum+=vals
+                    P1.append(sum)
+                
+                ra=random.random()
 
-            for t in range(len(P)):
-                if P1[t]<ra<P1[t+1]:
-                   s0=Neig[t]
-                   break
+                for t in range(len(P)):
+                    if P1[t]<ra<P1[t+1]:
+                       s0=Neig[t]
+                       break
+                    else:
+                        continue
+                
+                #t=random.randint(0,v) #Need to give weights here
+                s0=Neig[t]
+
+                Dimer.append([b,s0])
+                Dimer.append([s0,b])
+
+                Neig2=Adj(s0)
+                Neig2.remove(b)
+                
+                for s1 in Neig2:
+                    if [s1,s0] in Dimer: 
+                        x1=s1
+
+                a=s0
+                b=x1
+
+                if a==c0:
+                    sz=it+1
+                    break
                 else:
-                    continue
+                    sz=It
             
-            #t=random.randint(0,v) #Need to give weights here
-            s0=Neig[t]
-
-            Dimer.append([b,s0])
-            Dimer.append([s0,b])
-
-            Neig2=Adj(s0)
-            Neig2.remove(b)
-            
-            for s1 in Neig2:
-                if [s1,s0] in Dimer: 
-                    x1=s1
-
-            a=s0
-            b=x1
-
-            if a==c0:
-                sz=it+1
-                break
             else:
-                sz=It
-        
-        else:
-            sz=it
-            break
+                sz=it
+                break
 
-    Worm_size.append(sz)
+        Worm_size.append(sz)
+
+    Dist=[]
+
+    for i in range(It+1):
+        c=0
+        for j in Worm_size:
+            if i==j:
+                c+=1
+        Dist.append(c/en)
+
+    return Dist
 
 I=list(np.arange(0,It+1,1))
 
-Dist=[]
-
-for i in range(It+1):
-    c=0
-    for j in Worm_size:
-        if i==j:
-            c+=1
-    Dist.append(c/en)
-
-plt.plot(I, Dist, 'r+')
+plt.plot(I, Dist(0), 'r+')
+plt.plot(I, Dist(1), 'b+')
 plt.show()
 
     
 # G=nx.Graph()
 
-# Dim=[]
-# for l in Dimer:
-#     Dim.append((l[0],l[1]))
+# # Dim=[]
+# # for l in Dimer:
+# #     Dim.append((l[0],l[1]))
 
-# G.add_edges_from(Dim)
+# G.add_edges_from(Ec)
 
 # nx.draw(G, with_labels=True, node_color='skyblue', node_size=100, font_size=12, font_weight='bold')
 
