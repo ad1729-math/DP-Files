@@ -302,9 +302,14 @@ for e in E1:
             Interactions.append([c1,c2,0])
 
 def JI(c1,c2):
-    for In in Interactions:
-        if c1==In[0] and c2==In[1]:
-           return In[2]
+
+     #return J0 #Ferromagnetic 
+
+     return -J0 #Anti-ferromagnetic
+
+    # for In in Interactions: #Spin-glass (binary)
+    #     if c1==In[0] and c2==In[1]:
+    #        return In[2]
             
 def W(c1,c2,b0):
     a,b=Rev_Enum(c1),Rev_Enum(c2)
@@ -331,8 +336,9 @@ def W(c1,c2,b0):
     else: 
         return 0
 
-It=500
-en=1000
+
+It=100
+en=500
 
 def Dist(b0):
 
@@ -431,12 +437,17 @@ def Dist(b0):
                 c+=1
         Dist.append(c/en)
 
-    return Dist
+    return Dist[-1]
 
-I=list(np.arange(0,It+1,1))
+# I=list(np.arange(0,It+1,1))
+B=np.linspace(0,7,40)
+Dist0=[]
+for b in B:
+    Dist0.append(Dist(b))
 
-plt.plot(I, Dist(0), 'r+')
-plt.plot(I, Dist(1), 'b+')
+plt.plot(B,Dist0,'r')
+# plt.plot(I, Dist(0), 'r+')
+# plt.plot(I, Dist(3), 'b+')
 plt.show()
 
     
