@@ -261,31 +261,35 @@ for e in E1:
 
       if 0<b[1]<m:
 
-        if a[0]==0 or a[0]==n-1:
+        if a[0]==0 or a[0]==n:
           
-          if b[0]!=0 or b[0]!=n-1:
+          if b[0]==0 or b[0]==n:
             Interactions.append([c1,c2,0])
+
           else:
+            #j=J0
             j=J0*random.choice([1,-1])
             Interactions.append([c1,c2,j])
 
         else:
+            #j=J0
             j=J0*random.choice([1,-1])
             Interactions.append([c1,c2,j])
-            
 
       else:
-          if b[0]==1 or b[0]==n0:
-            Interactions.append([c1,c2,0])      
-          else:      
+          if a[0]==0 or a[0]==n:
+            Interactions.append([c1,c2,0])              
+          else:
+            #j=J0
             j=J0*random.choice([1,-1])
-            Interactions.append([c1,c2,j]) 
+            Interactions.append([c1,c2,j])    
           
     elif a[1]==0:
         if b[1]==1:
             if b[0]==0 or b[0]==n:
                Interactions.append([c1,c2,0])
             else:
+               #j=J0
                j=J0*random.choice([1,-1])
                Interactions.append([c1,c2,j])   
         else:
@@ -296,10 +300,12 @@ for e in E1:
             if b[0]==0 or b[0]==n:
                Interactions.append([c1,c2,0])
             else:
+               #j=J0
                j=J0*random.choice([1,-1])
                Interactions.append([c1,c2,j])   
         else:
             Interactions.append([c1,c2,0])
+
 
 def JI(c1,c2):
 
@@ -310,7 +316,8 @@ def JI(c1,c2):
     for In in Interactions: #Spin-glass (binary)
         if c1==In[0] and c2==In[1]:
            return In[2]
-            
+        
+
 def W(c1,c2,b0):
     a,b=Rev_Enum(c1),Rev_Enum(c2)
 
@@ -335,21 +342,32 @@ def W(c1,c2,b0):
     
     else: 
         return 0
+    
 
 
-It=2000
-en=2000
+It=200
+en=5000
 
 def Dist(b0):
 
     Worm_size=[]
+    En=[]
+
+    E00=1
+    for e in E1:
+        e0=list(e)
+        E00=E00*W(e0[0],e0[1],b0)
+
+    E0=np.sqrt(E00)
 
     for e in range(en):
+
+        Ef=E0
 
         Dimer=[]
 
         for e in E1:
-         Dimer.append(list(e))
+            Dimer.append(list(e))
 
         x,y,k=random.randint(1,n-1), random.randint(1,m-1), random.randint(1,3)
         c0=Enum(x,y,k)
@@ -366,6 +384,8 @@ def Dist(b0):
 
             Dimer.remove([b,a])
             Dimer.remove([a,b])
+
+            weight1=W(a,b,b0)
 
             Neig=Adj(b)
             Neig.remove(a)
@@ -384,6 +404,7 @@ def Dist(b0):
                 for w in We:
                     P.append(w/Norm)
 
+                weight2=W(s,b,b0)
 
                 P1=[0]
                 sum=0
@@ -421,11 +442,15 @@ def Dist(b0):
                     break
                 else:
                     sz=It
+
+                Ef=Ef*(weight2/weight1)
             
             else:
                 sz=it
                 break
 
+    
+        En.append(-np.log(Ef)/b0)
         Worm_size.append(sz)
 
     Dist=[]
@@ -437,21 +462,55 @@ def Dist(b0):
                 c+=1
         Dist.append(c/en)
 
-    return Dist
+    Evals=np.sort(list(set(En)))
 
-I=list(np.arange(0,It+1,1))
+    EnDist=[]
+    for e in Evals:
+        c0=0
+        for e1 in En: 
+            if e1==e:
+               c0+=1
 
-# B=np.linspace(0,7,40)
-# Dist0=[]
-# for b in B:
-#     Dist0.append(Dist(b))
+        EnDist.append(c0/en)
 
-# plt.plot(B,Dist0,'r')
-plt.plot(I, Dist(0), 'r+', label='b=0')
-plt.plot(I, Dist(3), 'b+', label='b=1')
-plt.xlabel("$l$")
-plt.ylabel('$P(l)$')
-plt.legend()
+
+    return Dist, Evals, EnDist
+
+b0=1
+
+E00=1
+for e in E1:
+    e0=list(e)
+    E00=E00*W(e0[0],e0[1],b0)
+
+E0=np.sqrt(E00)
+
+E=Dist(b0)
+#Still not full proof
+
+# b0=1
+# E0=1
+# for e in E1:
+#     e0=list(e)
+#     E0=E0*W(e0[0],e0[1],b0)
+
+# print(-np.log(E0))
+
+# I=list(np.arange(0,It+1,1))
+
+# # B=np.linspace(0,7,40)
+# # Dist0=[]
+# # for b in B:
+# #     Dist0.append(Dist(b))
+
+# # plt.plot(B,Dist0,'r')
+plt.plot(E[1],E[2],'b+')
+plt.axvline(x=E0, color='r', linestyle='--')
+# # plt.plot(I, Dist[0](0), 'r+', label='b=0')
+# # plt.plot(I, Dist[0](3), 'b+', label='b=1')
+# plt.xlabel("$Energy log$")
+# plt.ylabel('$P(Energy)$')
+# plt.legend()
 plt.show()
 
     
@@ -461,7 +520,7 @@ plt.show()
 # # for l in Dimer:
 # #     Dim.append((l[0],l[1]))
 
-# G.add_edges_from(Ec)
+# G.add_edges_from(E1)
 
 # nx.draw(G, with_labels=True, node_color='skyblue', node_size=100, font_size=12, font_weight='bold')
 
