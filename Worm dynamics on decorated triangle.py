@@ -267,21 +267,21 @@ for e in E1:
             Interactions.append([c1,c2,0])
 
           else:
-            #j=J0
-            j=J0*random.choice([1,-1])
+            j=J0
+            #j=J0*random.choice([1,-1])
             Interactions.append([c1,c2,j])
 
         else:
-            #j=J0
-            j=J0*random.choice([1,-1])
+            j=J0
+            #j=J0*random.choice([1,-1])
             Interactions.append([c1,c2,j])
 
       else:
           if a[0]==0 or a[0]==n:
             Interactions.append([c1,c2,0])              
           else:
-            #j=J0
-            j=J0*random.choice([1,-1])
+            j=J0
+            #j=J0*random.choice([1,-1])
             Interactions.append([c1,c2,j])    
           
     elif a[1]==0:
@@ -289,8 +289,8 @@ for e in E1:
             if b[0]==0 or b[0]==n:
                Interactions.append([c1,c2,0])
             else:
-               #j=J0
-               j=J0*random.choice([1,-1])
+               j=J0
+               #j=J0*random.choice([1,-1])
                Interactions.append([c1,c2,j])   
         else:
             Interactions.append([c1,c2,0])
@@ -300,8 +300,8 @@ for e in E1:
             if b[0]==0 or b[0]==n:
                Interactions.append([c1,c2,0])
             else:
-               #j=J0
-               j=J0*random.choice([1,-1])
+               j=J0
+               #j=J0*random.choice([1,-1])
                Interactions.append([c1,c2,j])   
         else:
             Interactions.append([c1,c2,0])
@@ -342,8 +342,6 @@ def W(c1,c2,b0):
     
     else: 
         return 0
-    
-
 
 It=200
 en=5000
@@ -478,23 +476,16 @@ def Dist(b0):
 
 b0=1
 
+E=Dist(b0)
+#Still not full proof
+
+b0=1
 E00=1
 for e in E1:
     e0=list(e)
     E00=E00*W(e0[0],e0[1],b0)
 
-E0=np.sqrt(E00)
-
-E=Dist(b0)
-#Still not full proof
-
-# b0=1
-# E0=1
-# for e in E1:
-#     e0=list(e)
-#     E0=E0*W(e0[0],e0[1],b0)
-
-# print(-np.log(E0))
+E0=-np.log(np.sqrt(E00))
 
 # I=list(np.arange(0,It+1,1))
 
@@ -506,12 +497,12 @@ E=Dist(b0)
 # # plt.plot(B,Dist0,'r')
 plt.plot(E[1],E[2],'b+')
 plt.axvline(x=E0, color='r', linestyle='--')
-# # plt.plot(I, Dist[0](0), 'r+', label='b=0')
-# # plt.plot(I, Dist[0](3), 'b+', label='b=1')
-# plt.xlabel("$Energy log$")
-# plt.ylabel('$P(Energy)$')
-# plt.legend()
-plt.show()
+# # # plt.plot(I, Dist[0](0), 'r+', label='b=0')
+# # # plt.plot(I, Dist[0](3), 'b+', label='b=1')
+# # plt.xlabel("$Energy log$")
+# # plt.ylabel('$P(Energy)$')
+# # plt.legend()
+# plt.show()
 
     
 # G=nx.Graph()
