@@ -502,7 +502,7 @@ plt.axvline(x=E0, color='r', linestyle='--')
 # # plt.xlabel("$Energy log$")
 # # plt.ylabel('$P(Energy)$')
 # # plt.legend()
-# plt.show()
+plt.show()
 
     
 # G=nx.Graph()
