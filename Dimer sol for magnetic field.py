@@ -48,7 +48,7 @@ def Zl(b,J,h):
 
     return s0 #E
 
-a=np.log(1+np.sqrt(2))/2
+a0=np.log(1+np.sqrt(2))/2
 
 # B=np.linspace(a-10**-2,a+10**-2,1000)
 # Mag,Mag1=[],[]
@@ -72,8 +72,7 @@ a=np.log(1+np.sqrt(2))/2
 # # plt.plot(B,E1,'g+')
 # plt.show() 
 
-def integrand(beta, h, J, x, y):
-    phi1,phi2=2*np.pi*x,2*np.pi*y
+def integrand(beta, h, J, phi1, phi2):
 
     term1 = 8 + 4*np.exp(-4*beta*h) + 2*np.exp(4*beta*h) + 2*np.exp(4*beta*h)*np.cosh(2*beta*J)
     term2 = -8*(np.cos(phi1) + np.cos(phi2))*(np.exp(2*beta*h)*np.cosh(beta*J) - np.exp(-2*beta*h))
@@ -89,15 +88,18 @@ def Z(beta, J, h):
 
 
 # Example usage:
-B=np.linspace(0.1,3,100)
-h=10**-3
+B=np.linspace(0.1,2,500)
+h=10**-6
 E=[]
 for b in B:
     a=(Z(b,1,h)-Z(b,1,0))/h
     E.append(a)
 
 plt.plot(B,E,'g')
-plt.axhline(x=a, color='b', linestyle='--')
+plt.axvline(x=a0, color='b', linestyle='--')
+plt.xlabel("$1/T$ --->")
+plt.ylabel("Magnetization --->")
+plt.legend()
 plt.show()
 
 
